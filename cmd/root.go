@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/coolapso/xm-cli/internal/util"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -52,15 +54,15 @@ func initConfig() {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
 	} else {
-		// Find config directory.
-		config, err := os.UserConfigDir()
+		// Find roo config directory.
+		cfgDir, err := util.GetConfigDir()
 		cobra.CheckErr(err)
-
-		viper.AddConfigPath(config)
-		viper.SetConfigType("envfile")
-		viper.SetConfigName("config")
+		viper.AddConfigPath(cfgDir)
+		viper.SetConfigName("xm-cli.env")
+		viper.SetConfigType("env")
 	}
 
+	viper.SetEnvPrefix("xm")
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
