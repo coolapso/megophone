@@ -1,0 +1,24 @@
+package util
+
+import (
+	"os"
+	"path/filepath"
+)
+
+func GetConfigDir() (string, error) {
+	userCfgDir, err := os.UserConfigDir()
+	if err != nil {
+		return "", err
+	}
+
+	return filepath.Join(userCfgDir, "xm-cli"), nil
+}
+
+func GetConfigFilePath() (string, error) {
+	cfgDir, err := GetConfigDir()
+	if err != nil {
+		return "", err
+	}
+	
+	return filepath.Join(cfgDir, "xm-cli.env"), nil
+}
