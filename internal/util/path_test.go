@@ -15,10 +15,9 @@ func TestGetConfigDir(t *testing.T) {
 	}
 
 	want := filepath.Join(cfgDir, "xm-cli")
-
 	got, err := GetConfigDir()
 	if err != nil {
-		t.Fatalf("Got error didn't expext one: %v", err)
+		t.Fatalf("Got error didn't expect one: %v", err)
 	}
 
 	if want != got {
@@ -28,5 +27,36 @@ func TestGetConfigDir(t *testing.T) {
 
 
 func TestGetConfigFilePath(t *testing.T) {
+	cfgDir, err := os.UserConfigDir()
+	if err != nil {
+		t.Fatalf("Failed to get user config dir: %v", err)
 
+	}
+
+	t.Run("Test main fileppath", func(t *testing.T) {
+		want := filepath.Join(cfgDir, "xm-cli", "xm-cli.env") 
+		got, err := GetConfigFilePath()
+		if err != nil {
+			t.Fatalf("Got error didn't expect one: %v", err)
+		}
+
+		if want != got {
+			t.Fatalf("Wrong file path: want %v, got %v", want, got)
+		}
+	})
+
+	t.Run("Test golang testing fileppath", func(t *testing.T) {
+		want := filepath.Join(cfgDir, "xm-cli", "xm-cli-test.env") 
+		os.Setenv("GOLANG_TESTING", "true")
+		defer os.Unsetenv("GOLANG_TESTING")
+		got, err := GetConfigFilePath()
+		if err != nil {
+			t.Fatalf("Got error didn't expect one: %v", err)
+		}
+
+		if want != got {
+			t.Fatalf("Wrong file path: want %v, got %v", want, got)
+		}
+	})
+	
 }

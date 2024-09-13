@@ -21,7 +21,7 @@ func GetConfigFilePath() (string, error) {
 	}
 
 	if os.Getenv("GOLANG_TESTING") == "true" {
-		return filepath.Join(cfgDir, ".twitch-cli-test.env"), nil
+		return filepath.Join(cfgDir, "xm-cli-test.env"), nil
 	}
 	
 	return filepath.Join(cfgDir, "xm-cli.env"), nil
