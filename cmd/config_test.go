@@ -91,7 +91,7 @@ func TestConfigMastodonUser(t *testing.T) {
 			r := bufio.NewReader(strings.NewReader(tt.input))
 			c.configMastodonUser(r)
 			if c.mUser != tt.expected {
-				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.xUser)
+				t.Fatalf("input and saved value do not match: expected %v, got %v", tt.expected, c.xUser)
 			}
 		})
 	}
