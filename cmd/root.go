@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/coolapso/xm-cli/internal/util"
 
@@ -10,26 +11,44 @@ import (
 	"github.com/spf13/viper"
 )
 
+
 var cfgFile string
 
 var rootCmd = &cobra.Command{
 	Use:   "xm-cli",
 	Short: "Post to twitter and mastodon from your CLI",
 	Long: `xm is a cli tool that allows you to post to both x (twitter)
-	and mastodon at the same time, with a single command, from you CLI`,
+and mastodon at the same time, with a single command, from you CLI`,
+	Args: cobra.MinimumNArgs(1),
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		if !util.IsToothLenght(args[0]) {
+			return fmt.Errorf("Message to long for Mastodon")
+		}
+
+		if !util.IsXLenght(args[0]) {
+			return fmt.Errorf("Message too long for X")
+		}
+
+		return nil
+	},
 
 	Run: func(cmd *cobra.Command, args []string) { 
+		fmt.Println(len(args[0]))
+		text := strings.ReplaceAll(args[0], "\\n", "\n")
+		fmt.Println(len(text))
+		
+
 		if cmd.Flags().Changed("x-only") {
-			fmt.Println("Posting only to x")
+			fmt.Printf("Posting %v only to x\n", text)
 			os.Exit(0)
 		} 
 
 		if cmd.Flags().Changed("m-only") {
-			fmt.Println("Posting only to mastodon")
+			fmt.Printf("Posting: %v only to mastodon\n", text)
 			os.Exit(0)
 		}
 
-		fmt.Println("Posting to twitter and Mastodon")
+		fmt.Printf("Posting %v to twitter and Mastodon\n", text)
 	},
 }
 
@@ -54,7 +73,7 @@ func initConfig() {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
 	} else {
-		// Find roo config directory.
+		// Find root config directory.
 		cfgDir, err := util.GetConfigDir()
 		cobra.CheckErr(err)
 		viper.AddConfigPath(cfgDir)
@@ -63,10 +82,11 @@ func initConfig() {
 	}
 
 	viper.SetEnvPrefix("xm")
-	viper.AutomaticEnv() // read in environment variables that match
+	viper.AutomaticEnv()
 
 	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+	if err := viper.ReadInConfig(); err != nil {
+		fmt.Fprintln(os.Stderr, "Failed to load config file at:", viper.ConfigFileUsed())
+		os.Exit(1)
 	}
 }

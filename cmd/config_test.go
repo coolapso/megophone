@@ -3,31 +3,13 @@ package cmd
 import (
 	"os"
 	"testing"
-	// "fmt"
-	"strings"
+
+	"fmt"
 	"bufio"
-	// "github.com/spf13/cobra"
-	// "github.com/spf13/viper"
+	"strings"
+
+	"github.com/coolapso/xm-cli/internal/util"
 )
-
-func TestMaskString(t *testing.T) {
-	t.Run("test 3 char string", func(t *testing.T) {
-		want := "bar"
-		got := maskString("bar")
-		if got != want { 
-			t.Fatalf("Strings do not match, want %v, got %v", want, got)
-		}
-	})
-
-	t.Run("test masked string", func(t *testing.T) {
-		want := "******baz"
-		got := maskString("foobarbaz")
-		if got != want { 
-			t.Fatalf("Strings do not match, want %v, got %v", want, got)
-		}
-
-	})
-}
 
 func TestLoadXVars(t *testing.T) {
 	want := config{
@@ -35,8 +17,8 @@ func TestLoadXVars(t *testing.T) {
 		xApiKey: "apikeystring",
 	}
 
-	os.Setenv("X_USER", want.xUser)
-	os.Setenv("X_API_KEY", want.xApiKey)
+	os.Setenv("XM_X_USER", want.xUser)
+	os.Setenv("XM_X_API_KEY", want.xApiKey)
 	defer os.Unsetenv("X_USER")
 	defer os.Unsetenv("X_API_KEY")
 
@@ -57,8 +39,8 @@ func TestLoadMastodonVars(t *testing.T) {
 		mApiKey: "apikeystring",
 	}
 
-	os.Setenv("MASTODON_USER", want.mUser)
-	os.Setenv("MASTODON_API_KEY", want.mApiKey)
+	os.Setenv("XM_MASTODON_USER", want.mUser)
+	os.Setenv("XM_MASTODON_API_KEY", want.mApiKey)
 
 	var got config
 	loadMastodonVars(&got)
@@ -157,5 +139,57 @@ func TestConfigMastodonApiKey(t *testing.T) {
 				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.xApiKey)
 			}
 		})
+	}
+}
+
+func TestWriteConfigFile(t *testing.T) {
+	if err := writeConfigFile(); err != nil {
+		t.Fatal("Failed to write config file: ", err)
+	}
+
+	cfgFilePath, err := util.GetConfigFilePath()
+	if err != nil { 
+		t.Fatal("Failed to get config file path: ", err)
+	}
+
+	if _, err := os.Stat(cfgFilePath); os.IsNotExist(err) {
+		t.Fatal("Expected config file did not find one")
+	}
+
+	os.Remove(cfgFilePath)
+}
+
+
+func TestConfigxm(t *testing.T) {
+	os.Setenv("GOLANG_TESTING", "true")
+	os.Setenv("XM_X_USER", "foo")
+	os.Setenv("XM_MASTODON_USER", "bar")
+	os.Setenv("XM_X_API_KEY", "somexapikey")
+	os.Setenv("XM_MASTODON_API_KEY", "somemastodonapikey")
+	
+	want, err := os.ReadFile("../fixtures/xm-cli.env")
+	if err != nil {
+		t.Fatal("Failed to open example env file: ", err)
+	}
+
+	cfgFilePath, err := util.GetConfigFilePath()
+	if err != nil { 
+		t.Fatal("Failed to get configuration file path: ", err)
+	}
+
+	if err := configxm(); err != nil { 
+		t.Fatal("Got error didn't expect one: ", err)
+	}
+	defer os.Remove(cfgFilePath)
+
+	got, err := os.ReadFile(cfgFilePath)
+	if err != nil {
+		t.Fatal("Failed to read test configuration file")
+	}
+	fmt.Println(string(cfgFilePath))
+
+
+	if string(want) != string(got) { 
+		t.Fatalf("Configuration file does not match, want:\n%v\ngot\n%v", string(want), string(got))
 	}
 }

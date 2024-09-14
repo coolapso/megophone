@@ -59,7 +59,7 @@ func(c *config) configMastodonApiKey (r *bufio.Reader) {
 }
 
 func configxm() error {
-	// Before setting config file, load any env variables 
+	// Before setting config file, load any env variables into config struct
 	loadXVars(&c)
 	loadMastodonVars(&c)
 	reader := bufio.NewReader(os.Stdin)
@@ -68,7 +68,7 @@ func configxm() error {
 	c.configXUser(reader)
 	viper.Set("x_user", c.xUser)
 
-	fmt.Printf("X API Key(%v): ", maskString(c.xApiKey))
+	fmt.Printf("X API Key(%v): ", util.MaskString(c.xApiKey))
 	c.configXApiKey(reader)
 	viper.Set("x_api_key", c.xApiKey)
 
@@ -76,7 +76,7 @@ func configxm() error {
 	c.configMastodonUser(reader)
 	viper.Set("mastodon_user", c.mUser)
 
-	fmt.Printf("Mastodon API Key(%v): ", maskString(c.mApiKey))
+	fmt.Printf("Mastodon API Key(%v): ", util.MaskString(c.mApiKey))
 	c.configMastodonApiKey(reader)
 	viper.Set("mastodon_api_key", c.mApiKey)
 
@@ -85,6 +85,30 @@ func configxm() error {
 	}
 
 	return nil
+}
+
+func loadXVars(c *config) {
+	c.xUser = viper.GetString("x_user")
+	if user, isSet := os.LookupEnv("XM_X_USER"); isSet { 
+		c.xUser = user
+	}
+
+	c.xApiKey = viper.GetString("x_api_key")
+	if key, isSet := os.LookupEnv("XM_X_API_KEY"); isSet { 
+		c.xApiKey = key
+	}
+}
+
+func loadMastodonVars(c *config) {
+	c.mUser = viper.GetString("mastodon_user")
+	if user, isSet := os.LookupEnv("XM_MASTODON_USER"); isSet { 
+		c.mUser = user
+	}
+
+	c.mApiKey = viper.GetString("mastodon_api_key")
+	if key, isSet := os.LookupEnv("XM_MASTODON_API_KEY"); isSet { 
+		c.mApiKey = key
+	}
 }
 
 func writeConfigFile() error {
@@ -98,7 +122,7 @@ func writeConfigFile() error {
 		return fmt.Errorf("Failed to get config file path: %v", err.Error())
 	}
 
-	// if the full path doesn't exist, make all the folders to get there
+	// Create necessary directories if they don't exist
 	if _, err := os.Stat(cfgDir); os.IsNotExist(err) {
 		err := os.MkdirAll(cfgDir, os.ModePerm)
 		if err != nil {
@@ -112,34 +136,3 @@ func writeConfigFile() error {
 
 	return nil
 }
-
-func maskString(s string) string {
-	l := len(s)
-	if l <= 3 {
-		return s
-	}
-
-	return strings.Repeat("*", l-3) + s[l-3:]
-
-}
-
-func loadXVars(c *config) {
-	if user, isSet := os.LookupEnv("XM_X_USER"); isSet { 
-		c.xUser = user
-	}
-
-	if key, isSet := os.LookupEnv("XM_X_API_KEY"); isSet { 
-		c.xApiKey = key
-	}
-}
-
-func loadMastodonVars(c *config) {
-	if user, isSet := os.LookupEnv("XM_MASTODON_USER"); isSet { 
-		c.mUser = user
-	}
-
-	if key, isSet := os.LookupEnv("XM_MASTODON_API_KEY"); isSet { 
-		c.mApiKey = key
-	}
-}
-
