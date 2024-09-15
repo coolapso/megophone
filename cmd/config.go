@@ -23,39 +23,49 @@ var configure = &cobra.Command{
 	},
 }
 
+type xdotcom struct {
+	apiKey string
+	apiKeySecret string
+}
+
+func(x *xdotcom) configApiKey(r *bufio.Reader) { 
+	i, _ := r.ReadString('\n')
+	if s := strings.TrimSpace(i); s != "" { 
+		x.apiKey = s
+	}
+}
+
+func(x *xdotcom) configApiKeySecret (r *bufio.Reader) {
+	i, _ := r.ReadString('\n')
+	if s := strings.TrimSpace(i); s != "" { 
+		x.apiKeySecret = s
+	}
+}
+
+
+type mastodon struct {
+	apiKey string
+	apiKeySecret string
+}
+
+func(m *mastodon) configApiKey(r *bufio.Reader) { 
+	i, _ := r.ReadString('\n')
+	if s := strings.TrimSpace(i); s != "" { 
+		m.apiKey = s
+	}
+}
+
+func(m *mastodon) configApiKeySecret (r *bufio.Reader) {
+	i, _ := r.ReadString('\n')
+	if s := strings.TrimSpace(i); s != "" { 
+		m.apiKeySecret = s
+	}
+}
+
+
 type config struct {
-	xUser	string
-	xApiKey string
-	mUser	string
-	mApiKey string
-}
-
-func(c *config) configXUser(r *bufio.Reader) { 
-	i, _ := r.ReadString('\n')
-	if s := strings.TrimSpace(i); s != "" { 
-		c.xUser = s
-	}
-}
-
-func(c *config) configXApiKey (r *bufio.Reader) {
-	i, _ := r.ReadString('\n')
-	if s := strings.TrimSpace(i); s != "" { 
-		c.xApiKey = s
-	}
-}
-
-func(c *config) configMastodonUser(r *bufio.Reader) { 
-	i, _ := r.ReadString('\n')
-	if s := strings.TrimSpace(i); s != "" { 
-		c.mUser = s
-	}
-}
-
-func(c *config) configMastodonApiKey (r *bufio.Reader) {
-	i, _ := r.ReadString('\n')
-	if s := strings.TrimSpace(i); s != "" { 
-		c.mApiKey = s
-	}
+	x xdotcom
+	m mastodon
 }
 
 func configxm() error {
@@ -64,21 +74,21 @@ func configxm() error {
 	loadMastodonVars(&c)
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Printf("X Username(%v): ", c.xUser)
-	c.configXUser(reader)
-	viper.Set("x_user", c.xUser)
+	fmt.Printf("X Api Key(%v): ", c.m.apiKey)
+	c.m.configApiKey(reader)
+	viper.Set("x_api_key", c.x.apiKey)
 
-	fmt.Printf("X API Key(%v): ", util.MaskString(c.xApiKey))
-	c.configXApiKey(reader)
-	viper.Set("x_api_key", c.xApiKey)
+	fmt.Printf("X API Key Secret(%v): ", util.MaskString(c.x.apiKeySecret))
+	c.x.configApiKeySecret(reader)
+	viper.Set("x_api_key_secret", c.x.apiKeySecret)
 
-	fmt.Printf("Mastodon Username(%v): ", c.mUser)
-	c.configMastodonUser(reader)
-	viper.Set("mastodon_user", c.mUser)
+	fmt.Printf("Mastodon Api Key(%v): ", c.m.apiKey)
+	c.m.configApiKey(reader)
+	viper.Set("mastodon_api_key", c.m.apiKey)
 
-	fmt.Printf("Mastodon API Key(%v): ", util.MaskString(c.mApiKey))
-	c.configMastodonApiKey(reader)
-	viper.Set("mastodon_api_key", c.mApiKey)
+	fmt.Printf("Mastodon API Key Secret(%v): ", util.MaskString(c.m.apiKeySecret))
+	c.m.configApiKeySecret(reader)
+	viper.Set("mastodon_api_key_secret", c.m.apiKeySecret)
 
 	if err := writeConfigFile(); err != nil {
 		return err
@@ -88,26 +98,26 @@ func configxm() error {
 }
 
 func loadXVars(c *config) {
-	c.xUser = viper.GetString("x_user")
-	if user, isSet := os.LookupEnv("XM_X_USER"); isSet { 
-		c.xUser = user
+	c.x.apiKey = viper.GetString("x_api_key")
+	if key, isSet := os.LookupEnv("XM_X_API_KEY"); isSet { 
+		c.x.apiKey = key
 	}
 
-	c.xApiKey = viper.GetString("x_api_key")
-	if key, isSet := os.LookupEnv("XM_X_API_KEY"); isSet { 
-		c.xApiKey = key
+	c.x.apiKeySecret = viper.GetString("x_api_key_secret")
+	if secret, isSet := os.LookupEnv("XM_X_API_KEY_SECRET"); isSet { 
+		c.x.apiKeySecret = secret
 	}
 }
 
 func loadMastodonVars(c *config) {
-	c.mUser = viper.GetString("mastodon_user")
-	if user, isSet := os.LookupEnv("XM_MASTODON_USER"); isSet { 
-		c.mUser = user
+	c.m.apiKey = viper.GetString("mastodon_api_key")
+	if key, isSet := os.LookupEnv("XM_MASTODON_API_KEY"); isSet { 
+		c.m.apiKey = key
 	}
 
-	c.mApiKey = viper.GetString("mastodon_api_key")
-	if key, isSet := os.LookupEnv("XM_MASTODON_API_KEY"); isSet { 
-		c.mApiKey = key
+	c.m.apiKeySecret = viper.GetString("mastodon_api_key_secret")
+	if secret, isSet := os.LookupEnv("XM_MASTODON_API_KEY_SECRET"); isSet { 
+		c.m.apiKeySecret = secret
 	}
 }
 

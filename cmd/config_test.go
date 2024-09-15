@@ -13,90 +13,51 @@ import (
 
 func TestLoadXVars(t *testing.T) {
 	want := config{
-		xUser: "foo",
-		xApiKey: "apikeystring",
+		x: xdotcom{
+			apiKey: "apikey",
+			apiKeySecret: "apikeysecretstring",
+		},
 	}
 
-	os.Setenv("XM_X_USER", want.xUser)
-	os.Setenv("XM_X_API_KEY", want.xApiKey)
-	defer os.Unsetenv("X_USER")
-	defer os.Unsetenv("X_API_KEY")
+	os.Setenv("XM_X_API_KEY", want.x.apiKey)
+	os.Setenv("XM_X_API_KEY_SECRET", want.x.apiKeySecret)
+	defer os.Unsetenv("XM_X_API_KEY")
+	defer os.Unsetenv("XM_X_API_KEY_SECRET")
 
 	var got config
 	loadXVars(&got)
-	if got.xUser != want.xUser { 
-		t.Fatalf("X Username does not match expected value: want %v, got %v", want.xUser, got.xUser)
+	if got.x.apiKey != want.x.apiKey { 
+		t.Fatalf("Api key does not match expected value: want %v, got %v", want.x.apiKey, got.x.apiKey)
 	}
 
-	if got.xApiKey != want.xApiKey { 
-		t.Fatalf("X Api Key does not math expected value: want %v, got %v", want.xApiKey, got.xApiKey)
+	if got.x.apiKeySecret != want.x.apiKeySecret { 
+		t.Fatalf("Api key Secret does not math expected value: want %v, got %v", want.x.apiKeySecret, got.x.apiKeySecret)
 	}
 }
 
 func TestLoadMastodonVars(t *testing.T) {
 	want := config{
-		mUser: "foo",
-		mApiKey: "apikeystring",
+		m: mastodon{
+			apiKey: "apikey",
+			apiKeySecret: "apikeysecretstring",
+		},
 	}
 
-	os.Setenv("XM_MASTODON_USER", want.mUser)
-	os.Setenv("XM_MASTODON_API_KEY", want.mApiKey)
+	os.Setenv("XM_MASTODON_API_KEY", want.m.apiKey)
+	os.Setenv("XM_MASTODON_API_KEY_SECRET", want.m.apiKeySecret)
+	defer os.Unsetenv("XM_MASTODON_API_KEY")
+	defer os.Unsetenv("XM_MASTODON_API_KEY_SECRET")
 
 	var got config
 	loadMastodonVars(&got)
-	if got.mUser != want.mUser { 
-		t.Fatalf("Mastodon Username does not match expected value: want %v, got %v", want.mUser, got.mUser)
+	if got.m.apiKey != want.m.apiKey { 
+		t.Fatalf("Api key does not match expected value: want %v, got %v", want.m.apiKey, got.m.apiKey)
 	}
 
-	if got.mApiKey != want.mApiKey { 
-		t.Fatalf("X Api Key does not matc expected value: want %v, got %v", want.mApiKey, got.mApiKey)
-	}
-}
-
-func TestConfigXUser(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected string
-	}{
-		{"Empty input", "\n", ""},
-		{"Valid input", "foo\n", "foo"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var c config
-			r := bufio.NewReader(strings.NewReader(tt.input))
-			c.configXUser(r)
-			if c.xUser != tt.expected {
-				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.xUser)
-			}
-		})
+	if got.m.apiKeySecret != want.m.apiKeySecret { 
+		t.Fatalf("Api Key does not matc expected value: want %v, got %v", want.m.apiKeySecret, got.m.apiKeySecret)
 	}
 }
-
-func TestConfigMastodonUser(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected string
-	}{
-		{"Empty input", "\n", ""},
-		{"Valid input", "foo\n", "foo"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var c config
-			r := bufio.NewReader(strings.NewReader(tt.input))
-			c.configMastodonUser(r)
-			if c.mUser != tt.expected {
-				t.Fatalf("input and saved value do not match: expected %v, got %v", tt.expected, c.xUser)
-			}
-		})
-	}
-}
-
 
 func TestConfigXApiKey(t *testing.T) {
 	tests := []struct {
@@ -105,16 +66,16 @@ func TestConfigXApiKey(t *testing.T) {
 		expected string
 	}{
 		{"Empty input", "\n", ""},
-		{"Valid input", "someApiKey\n", "someApiKey"},
+		{"Valid input", "foo\n", "foo"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var c config
 			r := bufio.NewReader(strings.NewReader(tt.input))
-			c.configXApiKey(r)
-			if c.xApiKey != tt.expected {
-				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.xApiKey)
+			c.x.configApiKey(r)
+			if c.x.apiKey != tt.expected {
+				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.x.apiKey)
 			}
 		})
 	}
@@ -127,6 +88,29 @@ func TestConfigMastodonApiKey(t *testing.T) {
 		expected string
 	}{
 		{"Empty input", "\n", ""},
+		{"Valid input", "foo\n", "foo"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var c config
+			r := bufio.NewReader(strings.NewReader(tt.input))
+			c.m.configApiKey(r)
+			if c.m.apiKey != tt.expected {
+				t.Fatalf("input and saved value do not match: expected %v, got %v", tt.expected, c.x.apiKey)
+			}
+		})
+	}
+}
+
+
+func TestConfigXApiKeySecret(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"Empty input", "\n", ""},
 		{"Valid input", "someApiKey\n", "someApiKey"},
 	}
 
@@ -134,9 +118,31 @@ func TestConfigMastodonApiKey(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var c config
 			r := bufio.NewReader(strings.NewReader(tt.input))
-			c.configMastodonApiKey(r)
-			if c.mApiKey != tt.expected {
-				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.xApiKey)
+			c.x.configApiKeySecret(r)
+			if c.x.apiKeySecret != tt.expected {
+				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.x.apiKeySecret)
+			}
+		})
+	}
+}
+
+func TestConfigMastodonApiKeySecret(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"Empty input", "\n", ""},
+		{"Valid input", "someApiKey\n", "someApiKey"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var c config
+			r := bufio.NewReader(strings.NewReader(tt.input))
+			c.m.configApiKeySecret(r)
+			if c.m.apiKeySecret != tt.expected {
+				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.x.apiKeySecret)
 			}
 		})
 	}
@@ -162,10 +168,10 @@ func TestWriteConfigFile(t *testing.T) {
 
 func TestConfigxm(t *testing.T) {
 	os.Setenv("GOLANG_TESTING", "true")
-	os.Setenv("XM_X_USER", "foo")
-	os.Setenv("XM_MASTODON_USER", "bar")
-	os.Setenv("XM_X_API_KEY", "somexapikey")
-	os.Setenv("XM_MASTODON_API_KEY", "somemastodonapikey")
+	os.Setenv("XM_X_API_KEY", "apikey")
+	os.Setenv("XM_MASTODON_API_KEY", "apikey")
+	os.Setenv("XM_X_API_KEY_SECRET", "apikeysecretstring")
+	os.Setenv("XM_MASTODON_API_KEY_SECRET", "apikeysecretstring")
 	
 	want, err := os.ReadFile("../fixtures/xm-cli.env")
 	if err != nil {
@@ -177,6 +183,13 @@ func TestConfigxm(t *testing.T) {
 		t.Fatal("Failed to get configuration file path: ", err)
 	}
 
+	// Redirect stdout to null device to suppress output
+	null, _ := os.Open(os.DevNull)
+	defer null.Close()
+	old := os.Stdout
+	os.Stdout = null
+	defer func() { os.Stdout = old }()
+
 	if err := configxm(); err != nil { 
 		t.Fatal("Got error didn't expect one: ", err)
 	}
@@ -187,7 +200,6 @@ func TestConfigxm(t *testing.T) {
 		t.Fatal("Failed to read test configuration file")
 	}
 	fmt.Println(string(cfgFilePath))
-
 
 	if string(want) != string(got) { 
 		t.Fatalf("Configuration file does not match, want:\n%v\ngot\n%v", string(want), string(got))
