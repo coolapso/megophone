@@ -167,20 +167,9 @@ func TestWriteConfigFile(t *testing.T) {
 
 
 func TestConfigxm(t *testing.T) {
-	os.Setenv("GOLANG_TESTING", "true")
-	os.Setenv("XM_X_API_KEY", "apikey")
-	os.Setenv("XM_MASTODON_API_KEY", "apikey")
-	os.Setenv("XM_X_API_KEY_SECRET", "apikeysecretstring")
-	os.Setenv("XM_MASTODON_API_KEY_SECRET", "apikeysecretstring")
-	
 	want, err := os.ReadFile("../fixtures/xm-cli.env")
 	if err != nil {
 		t.Fatal("Failed to open example env file: ", err)
-	}
-
-	cfgFilePath, err := util.GetConfigFilePath()
-	if err != nil { 
-		t.Fatal("Failed to get configuration file path: ", err)
 	}
 
 	// Redirect stdout to null device to suppress output
@@ -189,19 +178,62 @@ func TestConfigxm(t *testing.T) {
 	old := os.Stdout
 	os.Stdout = null
 	defer func() { os.Stdout = old }()
+	os.Setenv("GOLANG_TESTING", "true")
+	defer os.Unsetenv("GOLANG_TESTING")
 
-	if err := configxm(); err != nil { 
-		t.Fatal("Got error didn't expect one: ", err)
+	cfgFilePath, err := util.GetConfigFilePath()
+	if err != nil { 
+		t.Fatal("Failed to get configuration file path: ", err)
 	}
-	defer os.Remove(cfgFilePath)
 
-	got, err := os.ReadFile(cfgFilePath)
-	if err != nil {
-		t.Fatal("Failed to read test configuration file")
-	}
-	fmt.Println(string(cfgFilePath))
+	t.Run("test user intput", func(t *testing.T) {
+		os.Remove(cfgFilePath)
 
-	if string(want) != string(got) { 
-		t.Fatalf("Configuration file does not match, want:\n%v\ngot\n%v", string(want), string(got))
-	}
+		input := "xapikey\nxapikeysecretstring\nmapikey\nmapikeysecretstring\n"
+		reader := bufio.NewReader(strings.NewReader(input))
+
+		if err := configxm(reader); err != nil {
+			t.Fatal("got error didn't expect one: ", err)
+		}
+		defer os.Remove(cfgFilePath)
+
+		got, err := os.ReadFile(cfgFilePath)
+		if err != nil {
+			t.Fatal("Failed to read test configuration file")
+		}
+		fmt.Println(string(cfgFilePath))
+
+		if string(want) != string(got) { 
+			t.Fatalf("Configuration file does not match, want:\n%v\ngot\n%v", string(want), string(got))
+		}
+	})
+
+	t.Run("test env vars", func(t *testing.T) {
+		input := "\n\n\n\n"
+		reader := bufio.NewReader(strings.NewReader(input))
+		os.Setenv("XM_X_API_KEY", "xapikey")
+		os.Setenv("XM_MASTODON_API_KEY", "mapikey")
+		os.Setenv("XM_X_API_KEY_SECRET", "xapikeysecretstring")
+		os.Setenv("XM_MASTODON_API_KEY_SECRET", "mapikeysecretstring")
+
+		defer os.Unsetenv("XM_X_API_KEY")
+		defer os.Unsetenv("XM_MASTODON_API_KEY")
+		defer os.Unsetenv("XM_X_API_KEY_SECRET")
+		defer os.Unsetenv("XM_MASTODON_API_KEY_SECRET")
+
+		if err := configxm(reader); err != nil { 
+			t.Fatal("Got error didn't expect one: ", err)
+		}
+		defer os.Remove(cfgFilePath)
+
+		got, err := os.ReadFile(cfgFilePath)
+		if err != nil {
+			t.Fatal("Failed to read test configuration file")
+		}
+		fmt.Println(string(cfgFilePath))
+
+		if string(want) != string(got) { 
+			t.Fatalf("Configuration file does not match, want:\n%v\ngot\n%v", string(want), string(got))
+		}
+	})
 }

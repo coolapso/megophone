@@ -19,7 +19,7 @@ var configure = &cobra.Command{
 	Long: `Creates xm-cli configuration file in $XDG_HOME_CONFIG and populates it
 	with settings`,
 	RunE: func(cmd *cobra.Command, args []string) error { 
-		return configxm()
+		return configxm(bufio.NewReader(os.Stdin))
 	},
 }
 
@@ -68,14 +68,13 @@ type config struct {
 	m mastodon
 }
 
-func configxm() error {
+func configxm(reader *bufio.Reader) error {
 	// Before setting config file, load any env variables into config struct
 	loadXVars(&c)
 	loadMastodonVars(&c)
-	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Printf("X Api Key(%v): ", c.m.apiKey)
-	c.m.configApiKey(reader)
+	fmt.Printf("X Api Key(%v): ", c.x.apiKey)
+	c.x.configApiKey(reader)
 	viper.Set("x_api_key", c.x.apiKey)
 
 	fmt.Printf("X API Key Secret(%v): ", util.MaskString(c.x.apiKeySecret))
