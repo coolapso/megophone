@@ -14,24 +14,38 @@ import (
 func TestLoadXVars(t *testing.T) {
 	want := config{
 		x: xdotcom{
-			oauthToken: "apikey",
-			oauthTokenSecret: "apikeysecretstring",
+			oauthToken: "oauthToken",
+			oauthTokenSecret: "oauthTokenSecret",
+			apiKey: "xapiKey",
+			apiKeySecret: "xapiKeysecretstring",
 		},
 	}
 
 	os.Setenv("XM_X_OAUTH_TOKEN", want.x.oauthToken)
 	os.Setenv("XM_X_OAUTH_TOKEN_SECRET", want.x.oauthTokenSecret)
+	os.Setenv("XM_X_API_KEY", want.x.apiKey)
+	os.Setenv("XM_X_API_KEY_SECRET", want.x.apiKeySecret)
 	defer os.Unsetenv("XM_X_OAUTH_TOKEN")
 	defer os.Unsetenv("XM_X_OAUTH_TOKEN_SECRET")
+	defer os.Unsetenv("XM_X_API_KEY")
+	defer os.Unsetenv("XM_X_API_KEY_SECRET")
 
 	var got config
 	loadXVars(&got)
 	if got.x.oauthToken != want.x.oauthToken { 
-		t.Fatalf("Api key does not match expected value: want %v, got %v", want.x.oauthToken, got.x.oauthToken)
+		t.Fatalf("Oauth token does not match expected value: want %v, got %v", want.x.oauthToken, got.x.oauthToken)
 	}
 
 	if got.x.oauthTokenSecret != want.x.oauthTokenSecret { 
-		t.Fatalf("Api key Secret does not math expected value: want %v, got %v", want.x.oauthTokenSecret, got.x.oauthTokenSecret)
+		t.Fatalf("Oauth token Secret does not math expected value: want %v, got %v", want.x.oauthTokenSecret, got.x.oauthTokenSecret)
+	}
+
+	if got.x.apiKey != want.x.apiKey { 
+		t.Fatalf("Api key does not match expected value: want %v, got %v", want.x.apiKey, got.x.apiKey)
+	}
+
+	if got.x.apiKeySecret != want.x.apiKeySecret {
+		t.Fatalf("Api key Secret does not math expected value: want %v, got %v", want.x.apiKeySecret, got.x.apiKeySecret)
 	}
 }
 
@@ -81,6 +95,73 @@ func TestConfigXOauthToken(t *testing.T) {
 	}
 }
 
+func TestConfigXOauthTokenSecret(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"Empty input", "\n", ""},
+		{"Valid input", "oauthTokenSecret\n", "oauthTokenSecret"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var c config
+			r := bufio.NewReader(strings.NewReader(tt.input))
+			c.x.configOauthTokenSecret(r)
+			if c.x.oauthTokenSecret != tt.expected {
+				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.x.oauthTokenSecret)
+			}
+		})
+	}
+}
+
+func TestConfigXAPIKey(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"Empty input", "\n", ""},
+		{"Valid input", "foo\n", "foo"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var c config
+			r := bufio.NewReader(strings.NewReader(tt.input))
+			c.x.configApiKey(r)
+			if c.x.apiKey != tt.expected {
+				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.x.apiKey)
+			}
+		})
+	}
+}
+
+func TestConfigXAPIKeySecret(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"Empty input", "\n", ""},
+		{"Valid input", "someApiKeySecret\n", "someApiKeySecret"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var c config
+			r := bufio.NewReader(strings.NewReader(tt.input))
+			c.x.configApiKeySecret(r)
+			if c.x.apiKeySecret != tt.expected {
+				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.x.apiKeySecret)
+			}
+		})
+	}
+}
+
+
 func TestConfigMastodonApiKey(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -103,28 +184,6 @@ func TestConfigMastodonApiKey(t *testing.T) {
 	}
 }
 
-
-func TestConfigXOauthTokenSecret(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected string
-	}{
-		{"Empty input", "\n", ""},
-		{"Valid input", "someApiKey\n", "someApiKey"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var c config
-			r := bufio.NewReader(strings.NewReader(tt.input))
-			c.x.configOauthTokenSecret(r)
-			if c.x.oauthTokenSecret != tt.expected {
-				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.x.oauthTokenSecret)
-			}
-		})
-	}
-}
 
 func TestConfigMastodonApiKeySecret(t *testing.T) {
 	tests := []struct {
@@ -189,7 +248,7 @@ func TestConfigxm(t *testing.T) {
 	t.Run("test user intput", func(t *testing.T) {
 		os.Remove(cfgFilePath)
 
-		input := "xoauthToken\nxoauthTokenSecret\nmapikey\nmapikeysecretstring\n"
+		input := "xoauthToken\nxoauthTokenSecret\nxapikey\nxapikeysecretstring\nmapikey\nmapikeysecretstring\n"
 		reader := bufio.NewReader(strings.NewReader(input))
 
 		if err := configxm(reader); err != nil {
@@ -212,8 +271,8 @@ func TestConfigxm(t *testing.T) {
 		input := "\n\n\n\n"
 		reader := bufio.NewReader(strings.NewReader(input))
 		os.Setenv("XM_X_OAUTH_TOKEN", "xoauthToken")
-		os.Setenv("XM_MASTODON_API_KEY", "mapikey")
 		os.Setenv("XM_X_OAUTH_TOKEN_SECRET", "xoauthTokenSecret")
+		os.Setenv("XM_MASTODON_API_KEY", "mapikey")
 		os.Setenv("XM_MASTODON_API_KEY_SECRET", "mapikeysecretstring")
 
 		defer os.Unsetenv("XM_X_OAUTH_TOKEN")

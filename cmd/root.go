@@ -40,6 +40,7 @@ and mastodon at the same time, with a single command, from you CLI`,
 	Run: func(cmd *cobra.Command, args []string) { 
 		text := strings.ReplaceAll(args[0], "\\n", "\n")
 
+		//TODO: Clean this part, Posting is working, No need to write "print"
 		if cmd.Flags().Changed("x-only") {
 			fmt.Printf("Posting %v only to x\n", text)
 			postX(text)
@@ -62,10 +63,10 @@ func postX(text string) {
 		os.Exit(1)
 	}
 
-	//TODO: Twitter uses API keys and access tokens
-	//Set both of them
 	clientInput := &gotwi.NewClientInput{
 		AuthenticationMethod: gotwi.AuthenMethodOAuth1UserContext,
+		APIKey:				  viper.GetString("x_api_key"),
+		APIKeySecret:		  viper.GetString("x_api_key_secret"),
 		OAuthToken:           viper.GetString("x_oauth_token"),
 		OAuthTokenSecret:     viper.GetString("x_oauth_token_secret"),
 	}
@@ -76,8 +77,6 @@ func postX(text string) {
 		os.Exit(1)
 	}
 
-	fmt.Println(clientInput)
-
 	post := &types.CreateInput {
 		Text: gotwi.String(text),
 	}
@@ -87,6 +86,8 @@ func postX(text string) {
 		fmt.Println("failed to post tweet: ", err)
 		os.Exit(1)
 	}
+	//TODO:
+	//How this output looks like: [1841578184564670472] Hello from xm-cli , make it look better
 	fmt.Printf("[%s] %s\n", gotwi.StringValue(resp.Data.ID), gotwi.StringValue(resp.Data.Text))
 }
 
