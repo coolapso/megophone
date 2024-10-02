@@ -4,8 +4,13 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"context"
 
 	"github.com/coolapso/xm-cli/internal/util"
+
+	"github.com/michimani/gotwi"
+	"github.com/michimani/gotwi/tweet/managetweet"
+	"github.com/michimani/gotwi/tweet/managetweet/types"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -33,13 +38,11 @@ and mastodon at the same time, with a single command, from you CLI`,
 	},
 
 	Run: func(cmd *cobra.Command, args []string) { 
-		fmt.Println(len(args[0]))
 		text := strings.ReplaceAll(args[0], "\\n", "\n")
-		fmt.Println(len(text))
-		
 
 		if cmd.Flags().Changed("x-only") {
 			fmt.Printf("Posting %v only to x\n", text)
+			postX(text)
 			os.Exit(0)
 		} 
 
@@ -50,6 +53,41 @@ and mastodon at the same time, with a single command, from you CLI`,
 
 		fmt.Printf("Posting %v to twitter and Mastodon\n", text)
 	},
+}
+
+func postX(text string) { 
+
+	if !util.IsXLenght(text) {
+		fmt.Println("Text is too long for a tweet")
+		os.Exit(1)
+	}
+
+	//TODO: Twitter uses API keys and access tokens
+	//Set both of them
+	clientInput := &gotwi.NewClientInput{
+		AuthenticationMethod: gotwi.AuthenMethodOAuth1UserContext,
+		OAuthToken:           viper.GetString("x_oauth_token"),
+		OAuthTokenSecret:     viper.GetString("x_oauth_token_secret"),
+	}
+
+	x, err := gotwi.NewClient(clientInput)
+	if err != nil { 
+		fmt.Println("Failed to create X Client:", err)
+		os.Exit(1)
+	}
+
+	fmt.Println(clientInput)
+
+	post := &types.CreateInput {
+		Text: gotwi.String(text),
+	}
+
+	resp, err := managetweet.Create(context.Background(), x, post)
+	if err != nil { 
+		fmt.Println("failed to post tweet: ", err)
+		os.Exit(1)
+	}
+	fmt.Printf("[%s] %s\n", gotwi.StringValue(resp.Data.ID), gotwi.StringValue(resp.Data.Text))
 }
 
 func Execute() {
@@ -85,8 +123,8 @@ func initConfig() {
 	viper.AutomaticEnv()
 
 	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err != nil {
-		fmt.Fprintln(os.Stderr, "Failed to load config file at:", viper.ConfigFileUsed())
-		os.Exit(1)
+	if err := viper.ReadInConfig(); err == nil {
+		return
+		// fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 	}
 }

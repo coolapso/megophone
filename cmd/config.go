@@ -24,21 +24,21 @@ var configure = &cobra.Command{
 }
 
 type xdotcom struct {
-	apiKey string
-	apiKeySecret string
+	oauthToken string
+	oauthTokenSecret string
 }
 
-func(x *xdotcom) configApiKey(r *bufio.Reader) { 
+func(x *xdotcom) configOauthToken(r *bufio.Reader) { 
 	i, _ := r.ReadString('\n')
 	if s := strings.TrimSpace(i); s != "" { 
-		x.apiKey = s
+		x.oauthToken = s
 	}
 }
 
-func(x *xdotcom) configApiKeySecret (r *bufio.Reader) {
+func(x *xdotcom) configOauthTokenSecret (r *bufio.Reader) {
 	i, _ := r.ReadString('\n')
 	if s := strings.TrimSpace(i); s != "" { 
-		x.apiKeySecret = s
+		x.oauthTokenSecret = s
 	}
 }
 
@@ -73,13 +73,13 @@ func configxm(reader *bufio.Reader) error {
 	loadXVars(&c)
 	loadMastodonVars(&c)
 
-	fmt.Printf("X Api Key(%v): ", c.x.apiKey)
-	c.x.configApiKey(reader)
-	viper.Set("x_api_key", c.x.apiKey)
+	fmt.Printf("X Api Key(%v): ", c.x.oauthToken)
+	c.x.configOauthToken(reader)
+	viper.Set("x_oauth_token", c.x.oauthToken)
 
-	fmt.Printf("X API Key Secret(%v): ", util.MaskString(c.x.apiKeySecret))
-	c.x.configApiKeySecret(reader)
-	viper.Set("x_api_key_secret", c.x.apiKeySecret)
+	fmt.Printf("X API Key Secret(%v): ", util.MaskString(c.x.oauthTokenSecret))
+	c.x.configOauthTokenSecret(reader)
+	viper.Set("x_oauth_token_secret", c.x.oauthTokenSecret)
 
 	fmt.Printf("Mastodon Api Key(%v): ", c.m.apiKey)
 	c.m.configApiKey(reader)
@@ -97,14 +97,14 @@ func configxm(reader *bufio.Reader) error {
 }
 
 func loadXVars(c *config) {
-	c.x.apiKey = viper.GetString("x_api_key")
-	if key, isSet := os.LookupEnv("XM_X_API_KEY"); isSet { 
-		c.x.apiKey = key
+	c.x.oauthToken = viper.GetString("x_oauth_token")
+	if key, isSet := os.LookupEnv("XM_X_OAUTH_TOKEN"); isSet { 
+		c.x.oauthToken = key
 	}
 
-	c.x.apiKeySecret = viper.GetString("x_api_key_secret")
-	if secret, isSet := os.LookupEnv("XM_X_API_KEY_SECRET"); isSet { 
-		c.x.apiKeySecret = secret
+	c.x.oauthTokenSecret = viper.GetString("x_oauth_token_secret")
+	if secret, isSet := os.LookupEnv("XM_X_OAUTH_TOKEN_SECRET"); isSet { 
+		c.x.oauthTokenSecret = secret
 	}
 }
 

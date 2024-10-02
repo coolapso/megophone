@@ -14,24 +14,24 @@ import (
 func TestLoadXVars(t *testing.T) {
 	want := config{
 		x: xdotcom{
-			apiKey: "apikey",
-			apiKeySecret: "apikeysecretstring",
+			oauthToken: "apikey",
+			oauthTokenSecret: "apikeysecretstring",
 		},
 	}
 
-	os.Setenv("XM_X_API_KEY", want.x.apiKey)
-	os.Setenv("XM_X_API_KEY_SECRET", want.x.apiKeySecret)
-	defer os.Unsetenv("XM_X_API_KEY")
-	defer os.Unsetenv("XM_X_API_KEY_SECRET")
+	os.Setenv("XM_X_OAUTH_TOKEN", want.x.oauthToken)
+	os.Setenv("XM_X_OAUTH_TOKEN_SECRET", want.x.oauthTokenSecret)
+	defer os.Unsetenv("XM_X_OAUTH_TOKEN")
+	defer os.Unsetenv("XM_X_OAUTH_TOKEN_SECRET")
 
 	var got config
 	loadXVars(&got)
-	if got.x.apiKey != want.x.apiKey { 
-		t.Fatalf("Api key does not match expected value: want %v, got %v", want.x.apiKey, got.x.apiKey)
+	if got.x.oauthToken != want.x.oauthToken { 
+		t.Fatalf("Api key does not match expected value: want %v, got %v", want.x.oauthToken, got.x.oauthToken)
 	}
 
-	if got.x.apiKeySecret != want.x.apiKeySecret { 
-		t.Fatalf("Api key Secret does not math expected value: want %v, got %v", want.x.apiKeySecret, got.x.apiKeySecret)
+	if got.x.oauthTokenSecret != want.x.oauthTokenSecret { 
+		t.Fatalf("Api key Secret does not math expected value: want %v, got %v", want.x.oauthTokenSecret, got.x.oauthTokenSecret)
 	}
 }
 
@@ -59,7 +59,7 @@ func TestLoadMastodonVars(t *testing.T) {
 	}
 }
 
-func TestConfigXApiKey(t *testing.T) {
+func TestConfigXOauthToken(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    string
@@ -73,9 +73,9 @@ func TestConfigXApiKey(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var c config
 			r := bufio.NewReader(strings.NewReader(tt.input))
-			c.x.configApiKey(r)
-			if c.x.apiKey != tt.expected {
-				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.x.apiKey)
+			c.x.configOauthToken(r)
+			if c.x.oauthToken != tt.expected {
+				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.x.oauthToken)
 			}
 		})
 	}
@@ -97,14 +97,14 @@ func TestConfigMastodonApiKey(t *testing.T) {
 			r := bufio.NewReader(strings.NewReader(tt.input))
 			c.m.configApiKey(r)
 			if c.m.apiKey != tt.expected {
-				t.Fatalf("input and saved value do not match: expected %v, got %v", tt.expected, c.x.apiKey)
+				t.Fatalf("input and saved value do not match: expected %v, got %v", tt.expected, c.m.apiKey)
 			}
 		})
 	}
 }
 
 
-func TestConfigXApiKeySecret(t *testing.T) {
+func TestConfigXOauthTokenSecret(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    string
@@ -118,9 +118,9 @@ func TestConfigXApiKeySecret(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var c config
 			r := bufio.NewReader(strings.NewReader(tt.input))
-			c.x.configApiKeySecret(r)
-			if c.x.apiKeySecret != tt.expected {
-				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.x.apiKeySecret)
+			c.x.configOauthTokenSecret(r)
+			if c.x.oauthTokenSecret != tt.expected {
+				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.x.oauthTokenSecret)
 			}
 		})
 	}
@@ -142,7 +142,7 @@ func TestConfigMastodonApiKeySecret(t *testing.T) {
 			r := bufio.NewReader(strings.NewReader(tt.input))
 			c.m.configApiKeySecret(r)
 			if c.m.apiKeySecret != tt.expected {
-				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.x.apiKeySecret)
+				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.m.apiKeySecret)
 			}
 		})
 	}
@@ -189,7 +189,7 @@ func TestConfigxm(t *testing.T) {
 	t.Run("test user intput", func(t *testing.T) {
 		os.Remove(cfgFilePath)
 
-		input := "xapikey\nxapikeysecretstring\nmapikey\nmapikeysecretstring\n"
+		input := "xoauthToken\nxoauthTokenSecret\nmapikey\nmapikeysecretstring\n"
 		reader := bufio.NewReader(strings.NewReader(input))
 
 		if err := configxm(reader); err != nil {
@@ -211,14 +211,14 @@ func TestConfigxm(t *testing.T) {
 	t.Run("test env vars", func(t *testing.T) {
 		input := "\n\n\n\n"
 		reader := bufio.NewReader(strings.NewReader(input))
-		os.Setenv("XM_X_API_KEY", "xapikey")
+		os.Setenv("XM_X_OAUTH_TOKEN", "xoauthToken")
 		os.Setenv("XM_MASTODON_API_KEY", "mapikey")
-		os.Setenv("XM_X_API_KEY_SECRET", "xapikeysecretstring")
+		os.Setenv("XM_X_OAUTH_TOKEN_SECRET", "xoauthTokenSecret")
 		os.Setenv("XM_MASTODON_API_KEY_SECRET", "mapikeysecretstring")
 
-		defer os.Unsetenv("XM_X_API_KEY")
+		defer os.Unsetenv("XM_X_OAUTH_TOKEN")
 		defer os.Unsetenv("XM_MASTODON_API_KEY")
-		defer os.Unsetenv("XM_X_API_KEY_SECRET")
+		defer os.Unsetenv("XM_X_OAUTH_TOKEN_SECRET")
 		defer os.Unsetenv("XM_MASTODON_API_KEY_SECRET")
 
 		if err := configxm(reader); err != nil { 
