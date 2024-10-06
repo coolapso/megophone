@@ -46,6 +46,7 @@ and mastodon at the same time, with a single command, from you CLI`,
 				os.Exit(1)
 			}
 			fmt.Println("Done!")
+			os.Exit(0)
 		} 
 
 		if cmd.Flags().Changed("m-only") {
@@ -53,7 +54,7 @@ and mastodon at the same time, with a single command, from you CLI`,
 			os.Exit(0)
 		}
 
-		// fmt.Printf("Posting %v to twitter and Mastodon\n", text)
+		fmt.Printf("Posting %v to twitter and Mastodon\n", text)
 	},
 }
 
