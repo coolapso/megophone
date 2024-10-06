@@ -51,22 +51,21 @@ func(x *Secrets) GetApiKeySecret() string {
 
 
 
-func CreatePost(ctx *context.Context, client *gotwi.Client, text string) (err error) { 
+func CreatePost(ctx context.Context, client *gotwi.Client, text string) (ID string, err error) { 
 	if !util.IsXLenght(text) {
-		return fmt.Errorf("Text is too long for a tweet")
+		return "", fmt.Errorf("Text is too long for a tweet")
 	}
 
 	post := &types.CreateInput {
 		Text: gotwi.String(text),
 	}
 
-	resp, err := managetweet.Create(context.Background(), client, post)
+	resp, err := managetweet.Create(ctx, client, post)
 	if err != nil { 
-		return fmt.Errorf("failed to post tweet: %v\n", err)
+		return "", fmt.Errorf("failed to post tweet: %v\n", err)
 	}
 
-	fmt.Println("Message posted on X, ID:", *resp.Data.ID)
-	return nil
+	return *resp.Data.ID, nil
 }
 
 func CreatePostWithMedia(ctx *context.Context, client *gotwi.Client, text string, media []byte) (err error) {

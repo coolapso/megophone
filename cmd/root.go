@@ -1,16 +1,15 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strings"
-	"context"
 
 	"github.com/coolapso/megophone/internal/util"
+	"github.com/coolapso/megophone/pkg/xdotcom"
 
 	"github.com/michimani/gotwi"
-	"github.com/michimani/gotwi/tweet/managetweet"
-	"github.com/michimani/gotwi/tweet/managetweet/types"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -40,9 +39,8 @@ and mastodon at the same time, with a single command, from you CLI`,
 	Run: func(cmd *cobra.Command, args []string) { 
 		text := strings.ReplaceAll(args[0], "\\n", "\n")
 
-		//TODO: Clean this part, Posting is working, No need to write "print"
 		if cmd.Flags().Changed("x-only") {
-			fmt.Printf("Posting %v only to x\n", text)
+			fmt.Println("Posting...")
 			if err := postX(text); err != nil {
 				fmt.Println("Failed posting to X,", err)
 				os.Exit(1)
@@ -55,17 +53,11 @@ and mastodon at the same time, with a single command, from you CLI`,
 			os.Exit(0)
 		}
 
-		fmt.Printf("Posting %v to twitter and Mastodon\n", text)
+		// fmt.Printf("Posting %v to twitter and Mastodon\n", text)
 	},
 }
 
 func postX(text string) (err error) { 
-
-	if !util.IsXLenght(text) {
-		fmt.Println("Text is too long for a tweet")
-		os.Exit(1)
-	}
-
 	clientInput := &gotwi.NewClientInput{
 		AuthenticationMethod: gotwi.AuthenMethodOAuth1UserContext,
 		APIKey:				  viper.GetString("x_api_key"),
@@ -79,16 +71,12 @@ func postX(text string) (err error) {
 		return fmt.Errorf("Failed to create X Client: %v\n", err)
 	}
 
-	post := &types.CreateInput {
-		Text: gotwi.String(text),
+	id, err :=  xdotcom.CreatePost(context.Background(), x, text)
+	if err != nil {
+		return err
 	}
 
-	resp, err := managetweet.Create(context.Background(), x, post)
-	if err != nil { 
-		return fmt.Errorf("failed to post tweet: %v\n", err)
-	}
-
-	fmt.Println("Message posted on X, ID:", *resp.Data.ID)
+	fmt.Println("X Post created with ID:", id)
 	return nil
 }
 
