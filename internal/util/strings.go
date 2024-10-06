@@ -22,8 +22,3 @@ func CleanString(s string) string {
 
 	return s
 }
-
-
-func IsToothLenght(s string) bool {
-	return len(CleanString(s)) <= 500
-}
