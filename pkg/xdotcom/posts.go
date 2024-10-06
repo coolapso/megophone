@@ -9,8 +9,12 @@ import (
 	"github.com/michimani/gotwi/tweet/managetweet/types"
 )
 
+func IsXLenght(s string) bool {
+	return len(util.CleanString(s)) <= 280
+}
+
 func CreatePost(ctx context.Context, client *gotwi.Client, text string) (ID string, err error) {
-	if !util.IsXLenght(text) {
+	if !IsXLenght(text) {
 		return "", fmt.Errorf("Text is too long for a tweet")
 	}
 
