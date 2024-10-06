@@ -10,13 +10,19 @@ import (
 	"github.com/coolapso/megophone/pkg/xdotcom"
 
 	"github.com/michimani/gotwi"
+	//Twitter API V2 does not yet support uploading media therefore these "legacy" packages are needed
+	"github.com/dghubble/oauth1"
+	twitterv1 "github.com/drswork/go-twitter/twitter"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 
-var cfgFile string
+var	(
+	cfgFile string
+)
+
 
 var rootCmd = &cobra.Command{
 	Use:   "megophone",
@@ -26,10 +32,11 @@ and mastodon at the same time, with a single command, from you CLI`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) { 
 		text := strings.ReplaceAll(args[0], "\\n", "\n")
+		mediaPath, _ := cmd.Flags().GetString("media-path")
 
 		if cmd.Flags().Changed("x-only") {
 			fmt.Println("Posting...")
-			if err := postX(text); err != nil {
+			if err := postX(text, mediaPath); err != nil {
 				fmt.Println("Failed posting to X,", err)
 				os.Exit(1)
 			}
@@ -46,7 +53,7 @@ and mastodon at the same time, with a single command, from you CLI`,
 	},
 }
 
-func postX(text string) (err error) { 
+func postX(text string, mediaPath string) (err error) { 
 	clientInput := &gotwi.NewClientInput{
 		AuthenticationMethod: gotwi.AuthenMethodOAuth1UserContext,
 		APIKey:				  viper.GetString("x_api_key"),
@@ -59,6 +66,32 @@ func postX(text string) (err error) {
 	if err != nil { 
 		return fmt.Errorf("Failed to create X Client: %v\n", err)
 	}
+
+	if mediaPath != "" { 
+		xv1Config := oauth1.NewConfig(clientInput.APIKey, clientInput.APIKeySecret)
+		token := oauth1.NewToken(clientInput.OAuthToken, clientInput.OAuthTokenSecret)
+		httpClient := xv1Config.Client(oauth1.NoContext, token)
+		xV1 := twitterv1.NewClient(httpClient)
+		mediaType := util.GetMediaType(mediaPath)
+
+		if mediaType != "image" && mediaType != "video" {
+			return fmt.Errorf("Media type %v not supported, please make sure you provide a image or video", mediaType)
+		}
+
+		media, err := util.OpenMediaFile(mediaPath)
+		if err != nil { 
+			return fmt.Errorf("Failed to open media file, %v\n", err)
+		}
+
+		id, err := xdotcom.CreatePostWithMedia(context.Background(), x, xV1, text, media, mediaType)
+		if err != nil {
+			return err
+		}
+		fmt.Println("X Post created with ID:", id)
+
+		return nil
+	}
+
 
 	id, err :=  xdotcom.CreatePost(context.Background(), x, text)
 	if err != nil {
@@ -81,6 +114,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $XDG_HOME_CONFIG/megophone/config.yaml)")
 	rootCmd.Flags().BoolP("x-only", "x", false, "Post to X only")
 	rootCmd.Flags().BoolP("m-only", "m", false, "Post to Mastodon Only")
+	rootCmd.Flags().StringP("media-path", "p", "", "Path of media to be uploaded")
 	rootCmd.AddCommand(configure)
 }
 
