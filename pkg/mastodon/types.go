@@ -28,5 +28,5 @@ func(s *Secrets) GetClientSecret() string {
 }
 
 func(s *Secrets) GetAccessToken() string {
-	return s.clientSecret
+	return s.accessToken
 }

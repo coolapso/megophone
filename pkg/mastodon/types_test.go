@@ -69,8 +69,9 @@ func TestAccessToken(t *testing.T) {
 
 	t.Run("test GetAccessToken", func (t *testing.T) {
 		s := Secrets{
-			clientSecret: want,
+			accessToken: want,
 		}
+
 		got := s.GetAccessToken()
 
 		if got != want {
