@@ -6,7 +6,6 @@ import (
 	// "fmt"
 	// "bufio"
 	// "strings"
-
 	// "github.com/coolapso/megophone/internal/util"
 )
 
@@ -144,7 +143,7 @@ func TestSetApiKeySecret(t *testing.T) {
 
 func TestGetOauthToken(t *testing.T) {
 	want := "oauthTokenValue"
-	s := Secrets {
+	s := Secrets{
 		oauthToken: want,
 	}
 	got := s.GetOauthToken()
@@ -157,7 +156,7 @@ func TestGetOauthToken(t *testing.T) {
 
 func TestGetOauthTokenSecret(t *testing.T) {
 	want := "oauthTokenSecretValue"
-	s := Secrets {
+	s := Secrets{
 		oauthTokenSecret: want,
 	}
 	got := s.GetOauthTokenSecret()
@@ -169,7 +168,7 @@ func TestGetOauthTokenSecret(t *testing.T) {
 
 func TestGetApiKey(t *testing.T) {
 	want := "apiKeyValue"
-	s := Secrets {
+	s := Secrets{
 		apiKey: want,
 	}
 	got := s.GetApiKey()
@@ -181,7 +180,7 @@ func TestGetApiKey(t *testing.T) {
 
 func TestGetApiKeySecret(t *testing.T) {
 	want := "apiKeySecretValue"
-	s := Secrets {
+	s := Secrets{
 		apiKeySecret: want,
 	}
 	got := s.GetApiKeySecret()
