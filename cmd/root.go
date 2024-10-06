@@ -24,18 +24,6 @@ var rootCmd = &cobra.Command{
 	Long: `xm is a cli tool that allows you to post to both x (twitter)
 and mastodon at the same time, with a single command, from you CLI`,
 	Args: cobra.MinimumNArgs(1),
-	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if !util.IsToothLenght(args[0]) {
-			return fmt.Errorf("Message to long for Mastodon")
-		}
-
-		if !util.IsXLenght(args[0]) {
-			return fmt.Errorf("Message too long for X")
-		}
-
-		return nil
-	},
-
 	Run: func(cmd *cobra.Command, args []string) { 
 		text := strings.ReplaceAll(args[0], "\\n", "\n")
 
