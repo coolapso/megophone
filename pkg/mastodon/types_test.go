@@ -4,6 +4,31 @@ import (
 	"testing"
 )
 
+func TestServer(t *testing.T) {
+	want := "https://mastodon.social"
+
+	t.Run("Test set server", func (t *testing.T) {
+		var s Secrets
+		s.SetServer(want)
+		got := s.server
+
+		if got != want {
+			t.Fatalf("expected %v, got %v", want, got)
+		}
+	})
+
+	t.Run("Test Get server", func (t *testing.T) {
+		s := Secrets {
+			server: want,
+		}
+		got := s.GetServer()
+
+		if got != want {
+			t.Fatalf("expected %v, got %v", want, got)
+		}
+	})
+}
+
 func TestClientKey(t *testing.T) {
 	want := "clientKeyValue"
 
