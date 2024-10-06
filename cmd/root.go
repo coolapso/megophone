@@ -6,7 +6,7 @@ import (
 	"strings"
 	"context"
 
-	"github.com/coolapso/xm-cli/internal/util"
+	"github.com/coolapso/megophone/internal/util"
 
 	"github.com/michimani/gotwi"
 	"github.com/michimani/gotwi/tweet/managetweet"
@@ -20,7 +20,7 @@ import (
 var cfgFile string
 
 var rootCmd = &cobra.Command{
-	Use:   "xm-cli",
+	Use:   "megophone",
 	Short: "Post to twitter and mastodon from your CLI",
 	Long: `xm is a cli tool that allows you to post to both x (twitter)
 and mastodon at the same time, with a single command, from you CLI`,
@@ -43,8 +43,11 @@ and mastodon at the same time, with a single command, from you CLI`,
 		//TODO: Clean this part, Posting is working, No need to write "print"
 		if cmd.Flags().Changed("x-only") {
 			fmt.Printf("Posting %v only to x\n", text)
-			postX(text)
-			os.Exit(0)
+			if err := postX(text); err != nil {
+				fmt.Println("Failed posting to X,", err)
+				os.Exit(1)
+			}
+			fmt.Println("Done!")
 		} 
 
 		if cmd.Flags().Changed("m-only") {
@@ -56,7 +59,7 @@ and mastodon at the same time, with a single command, from you CLI`,
 	},
 }
 
-func postX(text string) { 
+func postX(text string) (err error) { 
 
 	if !util.IsXLenght(text) {
 		fmt.Println("Text is too long for a tweet")
@@ -73,8 +76,7 @@ func postX(text string) {
 
 	x, err := gotwi.NewClient(clientInput)
 	if err != nil { 
-		fmt.Println("Failed to create X Client:", err)
-		os.Exit(1)
+		return fmt.Errorf("Failed to create X Client: %v\n", err)
 	}
 
 	post := &types.CreateInput {
@@ -83,12 +85,11 @@ func postX(text string) {
 
 	resp, err := managetweet.Create(context.Background(), x, post)
 	if err != nil { 
-		fmt.Println("failed to post tweet: ", err)
-		os.Exit(1)
+		return fmt.Errorf("failed to post tweet: %v\n", err)
 	}
-	//TODO:
-	//How this output looks like: [1841578184564670472] Hello from xm-cli , make it look better
-	fmt.Printf("[%s] %s\n", gotwi.StringValue(resp.Data.ID), gotwi.StringValue(resp.Data.Text))
+
+	fmt.Println("Message posted on X, ID:", *resp.Data.ID)
+	return nil
 }
 
 func Execute() {
@@ -100,7 +101,7 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $XDG_HOME_CONFIG/xm-cli/config.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $XDG_HOME_CONFIG/megophone/config.yaml)")
 	rootCmd.Flags().BoolP("x-only", "x", false, "Post to X only")
 	rootCmd.Flags().BoolP("m-only", "m", false, "Post to Mastodon Only")
 	rootCmd.AddCommand(configure)
@@ -116,7 +117,7 @@ func initConfig() {
 		cfgDir, err := util.GetConfigDir()
 		cobra.CheckErr(err)
 		viper.AddConfigPath(cfgDir)
-		viper.SetConfigName("xm-cli.env")
+		viper.SetConfigName("megophone.env")
 		viper.SetConfigType("env")
 	}
 

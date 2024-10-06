@@ -6,7 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/coolapso/xm-cli/internal/util"
+	"github.com/coolapso/megophone/internal/util"
+	"github.com/coolapso/megophone/pkg/xdotcom"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -15,49 +16,13 @@ var c config
 
 var configure = &cobra.Command{
 	Use: "configure",
-	Short: "Configures xm-cli",
-	Long: `Creates xm-cli configuration file in $XDG_HOME_CONFIG and populates it
+	Short: "Configures megophone",
+	Long: `Creates megophone configuration file in $XDG_HOME_CONFIG and populates it
 	with settings`,
 	RunE: func(cmd *cobra.Command, args []string) error { 
-		return configxm(bufio.NewReader(os.Stdin))
+		return configMegophone(bufio.NewReader(os.Stdin))
 	},
 }
-
-type xdotcom struct {
-	oauthToken string
-	oauthTokenSecret string
-	apiKey string
-	apiKeySecret string
-}
-
-func(x *xdotcom) configOauthToken(r *bufio.Reader) { 
-	i, _ := r.ReadString('\n')
-	if s := strings.TrimSpace(i); s != "" { 
-		x.oauthToken = s
-	}
-}
-
-func(x *xdotcom) configOauthTokenSecret (r *bufio.Reader) {
-	i, _ := r.ReadString('\n')
-	if s := strings.TrimSpace(i); s != "" { 
-		x.oauthTokenSecret = s
-	}
-}
-
-func(x *xdotcom) configApiKey(r *bufio.Reader) { 
-	i, _ := r.ReadString('\n')
-	if s := strings.TrimSpace(i); s != "" { 
-		x.apiKey = s
-	}
-}
-
-func(x *xdotcom) configApiKeySecret (r *bufio.Reader) {
-	i, _ := r.ReadString('\n')
-	if s := strings.TrimSpace(i); s != "" { 
-		x.apiKeySecret = s
-	}
-}
-
 
 type mastodon struct {
 	apiKey string
@@ -80,30 +45,42 @@ func(m *mastodon) configApiKeySecret (r *bufio.Reader) {
 
 
 type config struct {
-	x xdotcom
+	x xdotcom.Secrets
 	m mastodon
 }
 
-func configxm(reader *bufio.Reader) error {
+func configMegophone(reader *bufio.Reader) error {
 	// Before setting config file, load any env variables into config struct
 	loadXVars(&c)
 	loadMastodonVars(&c)
 
-	fmt.Printf("X Oauth Token(%v): ", util.MaskString(c.x.oauthToken))
-	c.x.configOauthToken(reader)
-	viper.Set("x_oauth_token", c.x.oauthToken)
+	fmt.Printf("X Oauth Token(%v): ", util.MaskString(c.x.GetOauthToken()))
+	oauthTokenInput, _ := reader.ReadString('\n')
+	if cleanInput := strings.TrimSpace(oauthTokenInput); cleanInput != "" {
+		c.x.SetOauthToken(cleanInput)
+	}
+	viper.Set("x_oauth_token", c.x.GetOauthToken())
 
-	fmt.Printf("X Oauth Token Secret(%v): ", util.MaskString(c.x.oauthTokenSecret))
-	c.x.configOauthTokenSecret(reader)
-	viper.Set("x_oauth_token_secret", c.x.oauthTokenSecret)
+	fmt.Printf("X Oauth Token Secret(%v): ", util.MaskString(c.x.GetOauthTokenSecret()))
+	oauthTokenSecretInput, _ := reader.ReadString('\n')
+	if cleanInput := strings.TrimSpace(oauthTokenSecretInput); cleanInput != "" {
+		c.x.SetOauthTokenSecret(cleanInput)
+	}
+	viper.Set("x_oauth_token_secret", c.x.GetOauthTokenSecret())
 
-	fmt.Printf("X API Key(%v): ", util.MaskString(c.x.apiKey))
-	c.x.configApiKey(reader)
-	viper.Set("x_api_key", c.x.apiKey)
+	fmt.Printf("X API Key(%v): ", util.MaskString(c.x.GetApiKey()))
+	apiKeyInput, _ := reader.ReadString('\n')
+	if cleanInput := strings.TrimSpace(apiKeyInput); cleanInput != "" {
+		c.x.SetApiKey(cleanInput)
+	}
+	viper.Set("x_api_key", c.x.GetApiKey())
 
-	fmt.Printf("X API Key Secret(%v): ", util.MaskString(c.x.apiKeySecret))
-	c.x.configApiKeySecret(reader)
-	viper.Set("x_api_key_secret", c.x.apiKeySecret)
+	fmt.Printf("X API Key Secret(%v): ", util.MaskString(c.x.GetApiKeySecret()))
+	apiKeySecretInput, _ := reader.ReadString('\n')
+	if cleanInput := strings.TrimSpace(apiKeySecretInput); cleanInput != "" {
+		c.x.SetApiKeySecret(cleanInput)
+	}
+	viper.Set("x_api_key_secret", c.x.GetApiKeySecret())
 
 	fmt.Printf("Mastodon Api Key(%v): ", util.MaskString(c.m.apiKey))
 	c.m.configApiKey(reader)
@@ -121,24 +98,24 @@ func configxm(reader *bufio.Reader) error {
 }
 
 func loadXVars(c *config) {
-	c.x.oauthToken = viper.GetString("x_oauth_token")
+	c.x.SetOauthToken(viper.GetString("x_oauth_token"))
 	if key, isSet := os.LookupEnv("XM_X_OAUTH_TOKEN"); isSet { 
-		c.x.oauthToken = key
+		c.x.SetOauthToken(key)
 	}
 
-	c.x.oauthTokenSecret = viper.GetString("x_oauth_token_secret")
+	c.x.SetOauthTokenSecret(viper.GetString("x_oauth_token_secret"))
 	if secret, isSet := os.LookupEnv("XM_X_OAUTH_TOKEN_SECRET"); isSet { 
-		c.x.oauthTokenSecret = secret
+		c.x.SetOauthTokenSecret(secret)
 	}
 
-	c.x.apiKey = viper.GetString("x_api_key")
+	c.x.SetApiKey(viper.GetString("x_api_key"))
 	if key, isSet := os.LookupEnv("XM_X_API_KEY"); isSet { 
-		c.x.apiKey = key
+		c.x.SetApiKey(key)
 	}
 
-	c.x.apiKeySecret = viper.GetString("x_api_key_secret")
+	c.x.SetApiKeySecret(viper.GetString("x_api_key_secret"))
 	if secret, isSet := os.LookupEnv("XM_X_API_KEY_SECRET"); isSet { 
-		c.x.apiKeySecret = secret
+		c.x.SetApiKeySecret(secret)
 	}
 }
 

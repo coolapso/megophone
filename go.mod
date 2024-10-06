@@ -1,4 +1,4 @@
-module github.com/coolapso/xm-cli
+module github.com/coolapso/megophone
 
 go 1.23.0
 

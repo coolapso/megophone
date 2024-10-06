@@ -8,23 +8,22 @@ import (
 	"bufio"
 	"strings"
 
-	"github.com/coolapso/xm-cli/internal/util"
+
+	"github.com/coolapso/megophone/internal/util"
+	// "github.com/coolapso/megophone/pkg/xdotcom"
 )
 
 func TestLoadXVars(t *testing.T) {
-	want := config{
-		x: xdotcom{
-			oauthToken: "oauthToken",
-			oauthTokenSecret: "oauthTokenSecret",
-			apiKey: "xapiKey",
-			apiKeySecret: "xapiKeysecretstring",
-		},
-	}
+	var want config
+	want.x.SetOauthToken("oauthToken")
+	want.x.SetOauthTokenSecret("oauthTokenSecret")
+	want.x.SetApiKey("xapikey")
+	want.x.SetApiKeySecret("xapiKeysecretstring")
 
-	os.Setenv("XM_X_OAUTH_TOKEN", want.x.oauthToken)
-	os.Setenv("XM_X_OAUTH_TOKEN_SECRET", want.x.oauthTokenSecret)
-	os.Setenv("XM_X_API_KEY", want.x.apiKey)
-	os.Setenv("XM_X_API_KEY_SECRET", want.x.apiKeySecret)
+	os.Setenv("XM_X_OAUTH_TOKEN", want.x.GetOauthToken())
+	os.Setenv("XM_X_OAUTH_TOKEN_SECRET", want.x.GetOauthTokenSecret())
+	os.Setenv("XM_X_API_KEY", want.x.GetApiKey())
+	os.Setenv("XM_X_API_KEY_SECRET", want.x.GetApiKeySecret())
 	defer os.Unsetenv("XM_X_OAUTH_TOKEN")
 	defer os.Unsetenv("XM_X_OAUTH_TOKEN_SECRET")
 	defer os.Unsetenv("XM_X_API_KEY")
@@ -32,20 +31,20 @@ func TestLoadXVars(t *testing.T) {
 
 	var got config
 	loadXVars(&got)
-	if got.x.oauthToken != want.x.oauthToken { 
-		t.Fatalf("Oauth token does not match expected value: want %v, got %v", want.x.oauthToken, got.x.oauthToken)
+	if got.x.GetOauthToken() != want.x.GetOauthToken() { 
+		t.Fatalf("Oauth token does not match expected value: want %v, got %v", want.x.GetOauthToken(), got.x.GetOauthToken())
 	}
 
-	if got.x.oauthTokenSecret != want.x.oauthTokenSecret { 
-		t.Fatalf("Oauth token Secret does not math expected value: want %v, got %v", want.x.oauthTokenSecret, got.x.oauthTokenSecret)
+	if got.x.GetOauthTokenSecret() != want.x.GetOauthTokenSecret() { 
+		t.Fatalf("Oauth token Secret does not math expected value: want %v, got %v", want.x.GetOauthTokenSecret(), got.x.GetOauthTokenSecret())
 	}
 
-	if got.x.apiKey != want.x.apiKey { 
-		t.Fatalf("Api key does not match expected value: want %v, got %v", want.x.apiKey, got.x.apiKey)
+	if got.x.GetApiKey() != want.x.GetApiKey() { 
+		t.Fatalf("Api key does not match expected value: want %v, got %v", want.x.GetApiKey(), got.x.GetApiKey())
 	}
 
-	if got.x.apiKeySecret != want.x.apiKeySecret {
-		t.Fatalf("Api key Secret does not math expected value: want %v, got %v", want.x.apiKeySecret, got.x.apiKeySecret)
+	if got.x.GetApiKeySecret() != want.x.GetApiKeySecret() {
+		t.Fatalf("Api key Secret does not math expected value: want %v, got %v", want.x.GetApiKeySecret(), got.x.GetApiKeySecret())
 	}
 }
 
@@ -72,95 +71,6 @@ func TestLoadMastodonVars(t *testing.T) {
 		t.Fatalf("Api Key does not matc expected value: want %v, got %v", want.m.apiKeySecret, got.m.apiKeySecret)
 	}
 }
-
-func TestConfigXOauthToken(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected string
-	}{
-		{"Empty input", "\n", ""},
-		{"Valid input", "foo\n", "foo"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var c config
-			r := bufio.NewReader(strings.NewReader(tt.input))
-			c.x.configOauthToken(r)
-			if c.x.oauthToken != tt.expected {
-				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.x.oauthToken)
-			}
-		})
-	}
-}
-
-func TestConfigXOauthTokenSecret(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected string
-	}{
-		{"Empty input", "\n", ""},
-		{"Valid input", "oauthTokenSecret\n", "oauthTokenSecret"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var c config
-			r := bufio.NewReader(strings.NewReader(tt.input))
-			c.x.configOauthTokenSecret(r)
-			if c.x.oauthTokenSecret != tt.expected {
-				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.x.oauthTokenSecret)
-			}
-		})
-	}
-}
-
-func TestConfigXAPIKey(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected string
-	}{
-		{"Empty input", "\n", ""},
-		{"Valid input", "foo\n", "foo"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var c config
-			r := bufio.NewReader(strings.NewReader(tt.input))
-			c.x.configApiKey(r)
-			if c.x.apiKey != tt.expected {
-				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.x.apiKey)
-			}
-		})
-	}
-}
-
-func TestConfigXAPIKeySecret(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected string
-	}{
-		{"Empty input", "\n", ""},
-		{"Valid input", "someApiKeySecret\n", "someApiKeySecret"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var c config
-			r := bufio.NewReader(strings.NewReader(tt.input))
-			c.x.configApiKeySecret(r)
-			if c.x.apiKeySecret != tt.expected {
-				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.x.apiKeySecret)
-			}
-		})
-	}
-}
-
 
 func TestConfigMastodonApiKey(t *testing.T) {
 	tests := []struct {
@@ -225,8 +135,8 @@ func TestWriteConfigFile(t *testing.T) {
 }
 
 
-func TestConfigxm(t *testing.T) {
-	want, err := os.ReadFile("../fixtures/xm-cli.env")
+func TestConfigMegophone(t *testing.T) {
+	want, err := os.ReadFile("../fixtures/megophone.env")
 	if err != nil {
 		t.Fatal("Failed to open example env file: ", err)
 	}
@@ -251,7 +161,7 @@ func TestConfigxm(t *testing.T) {
 		input := "xoauthToken\nxoauthTokenSecret\nxapikey\nxapikeysecretstring\nmapikey\nmapikeysecretstring\n"
 		reader := bufio.NewReader(strings.NewReader(input))
 
-		if err := configxm(reader); err != nil {
+		if err := configMegophone(reader); err != nil {
 			t.Fatal("got error didn't expect one: ", err)
 		}
 		defer os.Remove(cfgFilePath)
@@ -280,7 +190,7 @@ func TestConfigxm(t *testing.T) {
 		defer os.Unsetenv("XM_X_OAUTH_TOKEN_SECRET")
 		defer os.Unsetenv("XM_MASTODON_API_KEY_SECRET")
 
-		if err := configxm(reader); err != nil { 
+		if err := configMegophone(reader); err != nil { 
 			t.Fatal("Got error didn't expect one: ", err)
 		}
 		defer os.Remove(cfgFilePath)

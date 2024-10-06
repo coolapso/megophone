@@ -11,7 +11,7 @@ func GetConfigDir() (string, error) {
 		return "", err
 	}
 
-	return filepath.Join(userCfgDir, "xm-cli"), nil
+	return filepath.Join(userCfgDir, "megophone"), nil
 }
 
 func GetConfigFilePath() (string, error) {
@@ -21,8 +21,8 @@ func GetConfigFilePath() (string, error) {
 	}
 
 	if os.Getenv("GOLANG_TESTING") == "true" {
-		return filepath.Join(cfgDir, "xm-cli-test.env"), nil
+		return filepath.Join(cfgDir, "megophone-test.env"), nil
 	}
 	
-	return filepath.Join(cfgDir, "xm-cli.env"), nil
+	return filepath.Join(cfgDir, "megophone.env"), nil
 }

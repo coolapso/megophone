@@ -20,7 +20,6 @@ func CleanString(s string) string {
 	return s
 }
 
-
 func IsXLenght(s string) bool {
 	return len(CleanString(s)) <= 280
 }

@@ -14,7 +14,7 @@ func TestGetConfigDir(t *testing.T) {
 
 	}
 
-	want := filepath.Join(cfgDir, "xm-cli")
+	want := filepath.Join(cfgDir, "megophone")
 	got, err := GetConfigDir()
 	if err != nil {
 		t.Fatalf("Got error didn't expect one: %v", err)
@@ -34,7 +34,7 @@ func TestGetConfigFilePath(t *testing.T) {
 	}
 
 	t.Run("Test main fileppath", func(t *testing.T) {
-		want := filepath.Join(cfgDir, "xm-cli", "xm-cli.env") 
+		want := filepath.Join(cfgDir, "megophone", "megophone.env") 
 		got, err := GetConfigFilePath()
 		if err != nil {
 			t.Fatalf("Got error didn't expect one: %v", err)
@@ -46,7 +46,7 @@ func TestGetConfigFilePath(t *testing.T) {
 	})
 
 	t.Run("Test golang testing fileppath", func(t *testing.T) {
-		want := filepath.Join(cfgDir, "xm-cli", "xm-cli-test.env") 
+		want := filepath.Join(cfgDir, "megophone", "megophone-test.env") 
 		os.Setenv("GOLANG_TESTING", "true")
 		defer os.Unsetenv("GOLANG_TESTING")
 		got, err := GetConfigFilePath()
