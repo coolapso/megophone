@@ -34,48 +34,8 @@ func configMegophone(reader *bufio.Reader) error {
 	// Before setting config file, load any env variables into config struct
 	loadXVars(&c)
 	loadMastodonVars(&c)
-
-	fmt.Printf("X Oauth Token(%v): ", util.MaskString(c.x.GetOauthToken()))
-	oauthTokenInput, _ := reader.ReadString('\n')
-	if cleanInput := strings.TrimSpace(oauthTokenInput); cleanInput != "" {
-		c.x.SetOauthToken(cleanInput)
-	}
-	viper.Set("x_oauth_token", c.x.GetOauthToken())
-
-	fmt.Printf("X Oauth Token Secret(%v): ", util.MaskString(c.x.GetOauthTokenSecret()))
-	oauthTokenSecretInput, _ := reader.ReadString('\n')
-	if cleanInput := strings.TrimSpace(oauthTokenSecretInput); cleanInput != "" {
-		c.x.SetOauthTokenSecret(cleanInput)
-	}
-	viper.Set("x_oauth_token_secret", c.x.GetOauthTokenSecret())
-
-	fmt.Printf("X API Key(%v): ", util.MaskString(c.x.GetApiKey()))
-	GetApiKeyInput, _ := reader.ReadString('\n')
-	if cleanInput := strings.TrimSpace(GetApiKeyInput); cleanInput != "" {
-		c.x.SetApiKey(cleanInput)
-	}
-	viper.Set("x_api_key", c.x.GetApiKey())
-
-	fmt.Printf("X API Key Secret(%v): ", util.MaskString(c.x.GetApiKeySecret()))
-	GetApiKeySecretInput, _ := reader.ReadString('\n')
-	if cleanInput := strings.TrimSpace(GetApiKeySecretInput); cleanInput != "" {
-		c.x.SetApiKeySecret(cleanInput)
-	}
-	viper.Set("x_api_key_secret", c.x.GetApiKeySecret())
-
-	fmt.Printf("Mastodon Api Key(%v): ", util.MaskString(c.m.GetApiKey()))
-	GetApiKeyInput, _ = reader.ReadString('\n')
-	if cleanInput := strings.TrimSpace(GetApiKeyInput); cleanInput != "" {
-		c.m.SetApiKey(cleanInput)
-	}
-	viper.Set("mastodon_api_key", c.m.GetApiKey())
-
-	fmt.Printf("Mastodon API Key Secret(%v): ", util.MaskString(c.m.GetApiKeySecret()))
-	GetApiKeySecretInput, _ = reader.ReadString('\n')
-	if cleanInput := strings.TrimSpace(GetApiKeySecretInput); cleanInput != "" {
-		c.m.SetApiKeySecret(cleanInput)
-	}
-	viper.Set("mastodon_api_key_secret", c.m.GetApiKeySecret())
+	configX(reader)
+	configMastodon(reader)
 
 	if err := writeConfigFile(); err != nil {
 		return err
@@ -107,15 +67,74 @@ func loadXVars(c *config) {
 }
 
 func loadMastodonVars(c *config) {
-	c.m.SetApiKey(viper.GetString("mastodon_api_key"))
-	if key, isSet := os.LookupEnv("MEGOPHONE_MASTODON_API_KEY"); isSet { 
-		c.m.SetApiKey(key)
+	c.m.SetClientKey(viper.GetString("mastodon_client_key"))
+	if key, isSet := os.LookupEnv("MEGOPHONE_MASTODON_CLIENT_KEY"); isSet { 
+		c.m.SetClientKey(key)
 	}
 
-	c.m.SetApiKeySecret(viper.GetString("mastodon_api_key_secret"))
-	if secret, isSet := os.LookupEnv("MEGOPHONE_MASTODON_API_KEY_SECRET"); isSet { 
-		c.m.SetApiKeySecret(secret)
+	c.m.SetClientSecret(viper.GetString("mastodon_client_secret"))
+	if secret, isSet := os.LookupEnv("MEGOPHONE_MASTODON_CLIENT_SECRET"); isSet { 
+		c.m.SetClientSecret(secret)
 	}
+
+	c.m.SetAccessToken(viper.GetString("mastodon_access_token"))
+	if secret, isSet := os.LookupEnv("MEGOPHONE_MASTODON_ACCESS_TOKEN"); isSet { 
+		c.m.SetAccessToken(secret)
+	}
+}
+
+func configX(reader *bufio.Reader) {
+	fmt.Printf("X Oauth Token(%v): ", util.MaskString(c.x.GetOauthToken()))
+	oauthTokenInput, _ := reader.ReadString('\n')
+	if cleanInput := strings.TrimSpace(oauthTokenInput); cleanInput != "" {
+		c.x.SetOauthToken(cleanInput)
+	}
+	viper.Set("x_oauth_token", c.x.GetOauthToken())
+
+	fmt.Printf("X Oauth Token Secret(%v): ", util.MaskString(c.x.GetOauthTokenSecret()))
+	oauthTokenSecretInput, _ := reader.ReadString('\n')
+	if cleanInput := strings.TrimSpace(oauthTokenSecretInput); cleanInput != "" {
+		c.x.SetOauthTokenSecret(cleanInput)
+	}
+	viper.Set("x_oauth_token_secret", c.x.GetOauthTokenSecret())
+
+	fmt.Printf("X API Key(%v): ", util.MaskString(c.x.GetApiKey()))
+	GetApiKeyInput, _ := reader.ReadString('\n')
+	if cleanInput := strings.TrimSpace(GetApiKeyInput); cleanInput != "" {
+		c.x.SetApiKey(cleanInput)
+	}
+	viper.Set("x_api_key", c.x.GetApiKey())
+
+	fmt.Printf("X API Key Secret(%v): ", util.MaskString(c.x.GetApiKeySecret()))
+	GetApiKeySecretInput, _ := reader.ReadString('\n')
+	if cleanInput := strings.TrimSpace(GetApiKeySecretInput); cleanInput != "" {
+		c.x.SetApiKeySecret(cleanInput)
+	}
+	viper.Set("x_api_key_secret", c.x.GetApiKeySecret())
+
+}
+
+func configMastodon(reader *bufio.Reader) {
+	fmt.Printf("Mastodon Client Key(%v): ", util.MaskString(c.m.GetClientKey()))
+	GetClientKeyInput, _ := reader.ReadString('\n')
+	if cleanInput := strings.TrimSpace(GetClientKeyInput); cleanInput != "" {
+		c.m.SetClientKey(cleanInput)
+	}
+	viper.Set("mastodon_client_key", c.m.GetClientKey())
+
+	fmt.Printf("Mastodon Client Secret(%v): ", util.MaskString(c.m.GetClientSecret()))
+	GetClientKeySecretInput, _ := reader.ReadString('\n')
+	if cleanInput := strings.TrimSpace(GetClientKeySecretInput); cleanInput != "" {
+		c.m.SetClientSecret(cleanInput)
+	}
+	viper.Set("mastodon_client_secret", c.m.GetClientSecret())
+
+	fmt.Printf("Mastodon Access Token(%v): ", util.MaskString(c.m.GetAccessToken()))
+	GetAccessTokenInput, _ := reader.ReadString('\n')
+	if cleanInput := strings.TrimSpace(GetAccessTokenInput); cleanInput != "" {
+		c.m.SetAccessToken(cleanInput)
+	}
+	viper.Set("mastodon_access_token", c.m.GetAccessToken())
 }
 
 func writeConfigFile() error {
