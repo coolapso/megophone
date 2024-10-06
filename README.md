@@ -1,2 +1,2 @@
 # megophone
-# megophone
+![megophoneMascot](megophone.png "MegoPhone")
