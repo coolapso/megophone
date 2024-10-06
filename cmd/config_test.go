@@ -3,14 +3,9 @@ package cmd
 import (
 	"os"
 	"testing"
-
-	"fmt"
 	"bufio"
 	"strings"
-
-
 	"github.com/coolapso/megophone/internal/util"
-	// "github.com/coolapso/megophone/pkg/xdotcom"
 )
 
 func TestLoadXVars(t *testing.T) {
@@ -70,6 +65,9 @@ func TestLoadMastodonVars(t *testing.T) {
 }
 
 func TestWriteConfigFile(t *testing.T) {
+	os.Setenv("GOLANG_TESTING", "true")
+	defer os.Unsetenv("GOLANG_TESTING")
+
 	if err := writeConfigFile(); err != nil {
 		t.Fatal("Failed to write config file: ", err)
 	}
@@ -86,11 +84,18 @@ func TestWriteConfigFile(t *testing.T) {
 	os.Remove(cfgFilePath)
 }
 
-
 func TestConfigMegophone(t *testing.T) {
 	want, err := os.ReadFile("../fixtures/megophone.env")
 	if err != nil {
 		t.Fatal("Failed to open example env file: ", err)
+	}
+
+	os.Setenv("GOLANG_TESTING", "true")
+	defer os.Unsetenv("GOLANG_TESTING")
+
+	cfgFilePath, err := util.GetConfigFilePath()
+	if err != nil { 
+		t.Fatal("Failed to get configuration file path: ", err)
 	}
 
 	// Redirect stdout to null device to suppress output
@@ -99,13 +104,6 @@ func TestConfigMegophone(t *testing.T) {
 	old := os.Stdout
 	os.Stdout = null
 	defer func() { os.Stdout = old }()
-	os.Setenv("GOLANG_TESTING", "true")
-	defer os.Unsetenv("GOLANG_TESTING")
-
-	cfgFilePath, err := util.GetConfigFilePath()
-	if err != nil { 
-		t.Fatal("Failed to get configuration file path: ", err)
-	}
 
 	t.Run("test user intput", func(t *testing.T) {
 		os.Remove(cfgFilePath)
@@ -122,7 +120,6 @@ func TestConfigMegophone(t *testing.T) {
 		if err != nil {
 			t.Fatal("Failed to read test configuration file")
 		}
-		fmt.Println(string(cfgFilePath))
 
 		if string(want) != string(got) { 
 			t.Fatalf("Configuration file does not match, want:\n%v\ngot\n%v", string(want), string(got))
@@ -151,7 +148,6 @@ func TestConfigMegophone(t *testing.T) {
 		if err != nil {
 			t.Fatal("Failed to read test configuration file")
 		}
-		fmt.Println(string(cfgFilePath))
 
 		if string(want) != string(got) { 
 			t.Fatalf("Configuration file does not match, want:\n%v\ngot\n%v", string(want), string(got))
