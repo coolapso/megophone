@@ -49,71 +49,23 @@ func TestLoadXVars(t *testing.T) {
 }
 
 func TestLoadMastodonVars(t *testing.T) {
-	want := config{
-		m: mastodon{
-			apiKey: "apikey",
-			apiKeySecret: "apikeysecretstring",
-		},
-	}
+	var want config
+	want.m.SetApiKey("xapikey")
+	want.m.SetApiKeySecret("xapiKeysecretstring")
 
-	os.Setenv("MEGOPHONE_MASTODON_API_KEY", want.m.apiKey)
-	os.Setenv("MEGOPHONE_MASTODON_API_KEY_SECRET", want.m.apiKeySecret)
+	os.Setenv("MEGOPHONE_MASTODON_API_KEY", want.m.GetApiKey())
+	os.Setenv("MEGOPHONE_MASTODON_API_KEY_SECRET", want.m.GetApiKeySecret())
 	defer os.Unsetenv("MEGOPHONE_MASTODON_API_KEY")
 	defer os.Unsetenv("MEGOPHONE_MASTODON_API_KEY_SECRET")
 
 	var got config
 	loadMastodonVars(&got)
-	if got.m.apiKey != want.m.apiKey { 
-		t.Fatalf("Api key does not match expected value: want %v, got %v", want.m.apiKey, got.m.apiKey)
+	if got.m.GetApiKey() != want.m.GetApiKey() { 
+		t.Fatalf("Api key does not match expected value: want %v, got %v", want.m.GetApiKey(), got.m.GetApiKey())
 	}
 
-	if got.m.apiKeySecret != want.m.apiKeySecret { 
-		t.Fatalf("Api Key does not matc expected value: want %v, got %v", want.m.apiKeySecret, got.m.apiKeySecret)
-	}
-}
-
-func TestConfigMastodonApiKey(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected string
-	}{
-		{"Empty input", "\n", ""},
-		{"Valid input", "foo\n", "foo"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var c config
-			r := bufio.NewReader(strings.NewReader(tt.input))
-			c.m.configApiKey(r)
-			if c.m.apiKey != tt.expected {
-				t.Fatalf("input and saved value do not match: expected %v, got %v", tt.expected, c.m.apiKey)
-			}
-		})
-	}
-}
-
-
-func TestConfigMastodonApiKeySecret(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected string
-	}{
-		{"Empty input", "\n", ""},
-		{"Valid input", "someApiKey\n", "someApiKey"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var c config
-			r := bufio.NewReader(strings.NewReader(tt.input))
-			c.m.configApiKeySecret(r)
-			if c.m.apiKeySecret != tt.expected {
-				t.Errorf("input and saved value do not match: expected %v, got %v", tt.expected, c.m.apiKeySecret)
-			}
-		})
+	if got.m.GetApiKeySecret() != want.m.GetApiKeySecret() { 
+		t.Fatalf("Api Key does not matc expected value: want %v, got %v", want.m.GetApiKeySecret(), got.m.GetApiKeySecret())
 	}
 }
 
