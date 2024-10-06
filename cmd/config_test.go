@@ -20,14 +20,14 @@ func TestLoadXVars(t *testing.T) {
 	want.x.SetApiKey("xapikey")
 	want.x.SetApiKeySecret("xapiKeysecretstring")
 
-	os.Setenv("XM_X_OAUTH_TOKEN", want.x.GetOauthToken())
-	os.Setenv("XM_X_OAUTH_TOKEN_SECRET", want.x.GetOauthTokenSecret())
-	os.Setenv("XM_X_API_KEY", want.x.GetApiKey())
-	os.Setenv("XM_X_API_KEY_SECRET", want.x.GetApiKeySecret())
-	defer os.Unsetenv("XM_X_OAUTH_TOKEN")
-	defer os.Unsetenv("XM_X_OAUTH_TOKEN_SECRET")
-	defer os.Unsetenv("XM_X_API_KEY")
-	defer os.Unsetenv("XM_X_API_KEY_SECRET")
+	os.Setenv("MEGOPHONE_X_OAUTH_TOKEN", want.x.GetOauthToken())
+	os.Setenv("MEGOPHONE_X_OAUTH_TOKEN_SECRET", want.x.GetOauthTokenSecret())
+	os.Setenv("MEGOPHONE_X_API_KEY", want.x.GetApiKey())
+	os.Setenv("MEGOPHONE_X_API_KEY_SECRET", want.x.GetApiKeySecret())
+	defer os.Unsetenv("MEGOPHONE_X_OAUTH_TOKEN")
+	defer os.Unsetenv("MEGOPHONE_X_OAUTH_TOKEN_SECRET")
+	defer os.Unsetenv("MEGOPHONE_X_API_KEY")
+	defer os.Unsetenv("MEGOPHONE_X_API_KEY_SECRET")
 
 	var got config
 	loadXVars(&got)
@@ -56,10 +56,10 @@ func TestLoadMastodonVars(t *testing.T) {
 		},
 	}
 
-	os.Setenv("XM_MASTODON_API_KEY", want.m.apiKey)
-	os.Setenv("XM_MASTODON_API_KEY_SECRET", want.m.apiKeySecret)
-	defer os.Unsetenv("XM_MASTODON_API_KEY")
-	defer os.Unsetenv("XM_MASTODON_API_KEY_SECRET")
+	os.Setenv("MEGOPHONE_MASTODON_API_KEY", want.m.apiKey)
+	os.Setenv("MEGOPHONE_MASTODON_API_KEY_SECRET", want.m.apiKeySecret)
+	defer os.Unsetenv("MEGOPHONE_MASTODON_API_KEY")
+	defer os.Unsetenv("MEGOPHONE_MASTODON_API_KEY_SECRET")
 
 	var got config
 	loadMastodonVars(&got)
@@ -180,15 +180,15 @@ func TestConfigMegophone(t *testing.T) {
 	t.Run("test env vars", func(t *testing.T) {
 		input := "\n\n\n\n"
 		reader := bufio.NewReader(strings.NewReader(input))
-		os.Setenv("XM_X_OAUTH_TOKEN", "xoauthToken")
-		os.Setenv("XM_X_OAUTH_TOKEN_SECRET", "xoauthTokenSecret")
-		os.Setenv("XM_MASTODON_API_KEY", "mapikey")
-		os.Setenv("XM_MASTODON_API_KEY_SECRET", "mapikeysecretstring")
+		os.Setenv("MEGOPHONE_X_OAUTH_TOKEN", "xoauthToken")
+		os.Setenv("MEGOPHONE_X_OAUTH_TOKEN_SECRET", "xoauthTokenSecret")
+		os.Setenv("MEGOPHONE_MASTODON_API_KEY", "mapikey")
+		os.Setenv("MEGOPHONE_MASTODON_API_KEY_SECRET", "mapikeysecretstring")
 
-		defer os.Unsetenv("XM_X_OAUTH_TOKEN")
-		defer os.Unsetenv("XM_MASTODON_API_KEY")
-		defer os.Unsetenv("XM_X_OAUTH_TOKEN_SECRET")
-		defer os.Unsetenv("XM_MASTODON_API_KEY_SECRET")
+		defer os.Unsetenv("MEGOPHONE_X_OAUTH_TOKEN")
+		defer os.Unsetenv("MEGOPHONE_MASTODON_API_KEY")
+		defer os.Unsetenv("MEGOPHONE_X_OAUTH_TOKEN_SECRET")
+		defer os.Unsetenv("MEGOPHONE_MASTODON_API_KEY_SECRET")
 
 		if err := configMegophone(reader); err != nil { 
 			t.Fatal("Got error didn't expect one: ", err)
