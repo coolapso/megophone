@@ -2,22 +2,31 @@ package mastodon
 
 
 type Secrets struct {
-	apiKey string
-	apiKeySecret string
+	clientKey string
+	clientSecret string
+	accessToken string
 }
 
-func(s *Secrets) SetApiKey(key string) { 
-	s.apiKey = key
+func(s *Secrets) SetClientKey(key string) { 
+	s.clientKey = key
 }
 
-func(s *Secrets) SetApiKeySecret (secret string) {
-		s.apiKeySecret = secret
+func(s *Secrets) SetClientSecret (secret string) {
+		s.clientSecret = secret
 }
 
-func(s *Secrets) GetApiKey() string {
-	return s.apiKey
+func(s *Secrets) SetAccessToken (secret string) {
+		s.accessToken = secret
 }
 
-func(s *Secrets) GetApiKeySecret() string {
-	return s.apiKeySecret
+func(s *Secrets) GetClientKey() string {
+	return s.clientKey
+}
+
+func(s *Secrets) GetClientSecret() string {
+	return s.clientSecret
+}
+
+func(s *Secrets) GetAccessToken() string {
+	return s.clientSecret
 }

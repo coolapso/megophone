@@ -4,48 +4,77 @@ import (
 	"testing"
 )
 
-func TestSetApiKey(t *testing.T) {
-	want := "apiKeyValue"
-	var s Secrets
-	s.SetApiKey(want)
-	got := s.apiKey
+func TestClientKey(t *testing.T) {
+	want := "clientKeyValue"
 
-	if got != want {
-		t.Fatalf("expected %v, got %v", want, got)
-	}
+	t.Run("Test SetClientKey", func (t *testing.T) {
+		var s Secrets
+		s.SetClientKey(want)
+		got := s.clientKey
+
+		if got != want {
+			t.Fatalf("expected %v, got %v", want, got)
+		}
+	})
+
+	t.Run("Test GetClientKey", func (t *testing.T) {
+		s := Secrets{
+			clientKey: want,
+		}
+		got := s.GetClientKey()
+
+		if got != want {
+			t.Fatalf("expected %v, got %v", want, got)
+		}
+	})
 }
 
-func TestSetApiKeySecret(t *testing.T) {
-	want := "apiKeySecretValue"
-	var s Secrets
-	s.SetApiKeySecret(want)
-	got := s.apiKeySecret
+func TestClientSecret(t *testing.T) {
+	want := "clientSecretValue"
 
-	if got != want {
-		t.Fatalf("expected %v, got %v", want, got)
-	}
+	t.Run("Test SetClientSecret", func (t *testing.T) {
+		var s Secrets
+		s.SetClientSecret(want)
+		got := s.clientSecret
+
+		if got != want {
+			t.Fatalf("expected %v, got %v", want, got)
+		}
+	})
+
+	t.Run("Test GetClientSecret", func (t *testing.T) {
+		s := Secrets{
+			clientSecret: want,
+		}
+		got := s.GetClientSecret()
+
+		if got != want {
+			t.Fatalf("expected %v, got %v", want, got)
+		}
+	})
 }
 
-func TestGetApiKey(t *testing.T) {
-	want := "apiKeyValue"
-	s := Secrets{
-		apiKey: want,
-	}
-	got := s.GetApiKey()
+func TestAccessToken(t *testing.T) {
+	want := "accessTokenValue"
 
-	if got != want {
-		t.Fatalf("expected %v, got %v", want, got)
-	}
-}
+	t.Run("Test SetAccessToken", func (t *testing.T) {
+		var s Secrets
+		s.SetAccessToken(want)
+		got := s.accessToken
 
-func TestGetApiKeySecret(t *testing.T) {
-	want := "apiKeySecretValue"
-	s := Secrets{
-		apiKeySecret: want,
-	}
-	got := s.GetApiKeySecret()
+		if got != want {
+			t.Fatalf("expected %v, got %v", want, got)
+		}
+	})
 
-	if got != want {
-		t.Fatalf("expected %v, got %v", want, got)
-	}
+	t.Run("test GetAccessToken", func (t *testing.T) {
+		s := Secrets{
+			clientSecret: want,
+		}
+		got := s.GetAccessToken()
+
+		if got != want {
+			t.Fatalf("expected %v, got %v", want, got)
+		}
+	})
 }
