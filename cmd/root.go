@@ -41,7 +41,6 @@ and mastodon at the same time, with a single command, from you CLI`,
 		mediaPath, _ := cmd.Flags().GetString("media-path")
 
 		if cmd.Flags().Changed("x-only") {
-			fmt.Println(posting())
 			if err := postX(text, mediaPath); err != nil {
 				fmt.Println("Failed posting to X,", err)
 				os.Exit(1)
@@ -50,7 +49,6 @@ and mastodon at the same time, with a single command, from you CLI`,
 		}
 
 		if cmd.Flags().Changed("m-only") {
-			fmt.Println(posting())
 			if err := postMastodon(text, mediaPath); err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -59,7 +57,6 @@ and mastodon at the same time, with a single command, from you CLI`,
 		}
 
 		if errors := postAll(text, mediaPath); errors != nil {
-			fmt.Println("Failed posting to all social media")
 			for err := range errors {
 				fmt.Println(err)
 			}
@@ -67,10 +64,6 @@ and mastodon at the same time, with a single command, from you CLI`,
 		}
 		os.Exit(0)
 	},
-}
-
-func posting() string {
-	return "Posting..."
 }
 
 func postX(text, mediaPath string) (err error) {
