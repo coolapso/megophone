@@ -7,7 +7,12 @@
 A single tool for multiple social networks.
 
 Megaphone allows you to post to multiple social networks simultaneously from your CLI.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/coolapso/megophone/refs/heads/main/media/usage.gif">
+</p>
 
+
+ 
 
 ## Features
 
