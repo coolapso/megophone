@@ -7,7 +7,7 @@ import (
 )
 
 func TestGetMediaType(t *testing.T) {
-	filePath := "../../megophone.png"
+	filePath := "../../media/megophone.png"
 	want := "image"
 	got := GetMediaType(filePath)
 
@@ -17,7 +17,7 @@ func TestGetMediaType(t *testing.T) {
 }
 
 func TestOpenMediaFile(t *testing.T) {
-	filePath := "../../megophone.png"
+	filePath := "../../media/megophone.png"
 	file, err := os.Open(filePath)
 	if err != nil {
 		t.Fatal("Failed to open file:", err)
