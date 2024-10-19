@@ -47,7 +47,7 @@ func getMastodonUserAuthorizationCode(reader *bufio.Reader, app *gomasto.Applica
 	//We don't care about the error here, if it doesn't work, user can always grab the link
 	_ = util.OpenURL(u.String())
 	fmt.Printf("Check your browser and copy/paste the given authorization code,\nif your browser didn't open use the url below:\n")
-	fmt.Printf("\n%s\n", u)
+	fmt.Printf("\n%s\n\n", u)
 	fmt.Print("Paste the code here:")
 	getAccessTokenInput, _ := reader.ReadString('\n')
 	authorizationCode := strings.TrimSpace(getAccessTokenInput)
