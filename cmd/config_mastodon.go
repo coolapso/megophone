@@ -58,8 +58,6 @@ func getAccessToken(ctx context.Context, authorizationCode string) (string, erro
 		return "", err
 	}
 
-	fmt.Println(client.Config.AccessToken)
-
 	return client.Config.AccessToken, nil
 }
 
