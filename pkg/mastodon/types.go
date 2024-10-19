@@ -1,26 +1,25 @@
 package mastodon
 
-
 type Secrets struct {
-	server	  string
-	clientID string
+	server       string
+	clientID     string
 	clientSecret string
-	accessToken string
+	accessToken  string
 }
 
 func (s *Secrets) SetServer(server string) {
 	s.server = server
 }
 
-func(s *Secrets) SetClientID(key string) { 
+func (s *Secrets) SetClientID(key string) {
 	s.clientID = key
 }
 
-func(s *Secrets) SetClientSecret (secret string) {
+func (s *Secrets) SetClientSecret(secret string) {
 	s.clientSecret = secret
 }
 
-func(s *Secrets) SetAccessToken (secret string) {
+func (s *Secrets) SetAccessToken(secret string) {
 	s.accessToken = secret
 }
 
@@ -28,14 +27,14 @@ func (s *Secrets) GetServer() string {
 	return s.server
 }
 
-func(s *Secrets) GetClientID() string {
+func (s *Secrets) GetClientID() string {
 	return s.clientID
 }
 
-func(s *Secrets) GetClientSecret() string {
+func (s *Secrets) GetClientSecret() string {
 	return s.clientSecret
 }
 
-func(s *Secrets) GetAccessToken() string {
+func (s *Secrets) GetAccessToken() string {
 	return s.accessToken
 }

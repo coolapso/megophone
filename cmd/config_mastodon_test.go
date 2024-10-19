@@ -1,13 +1,13 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-	"testing"
 	"bufio"
-	"strings"
+	"fmt"
 	gomasto "github.com/mattn/go-mastodon"
 	"github.com/spf13/viper"
+	"os"
+	"strings"
+	"testing"
 )
 
 func TestConfigMastodonServer(t *testing.T) {
@@ -20,7 +20,7 @@ func TestConfigMastodonServer(t *testing.T) {
 	wantMastodonServer := "https://mastodon.social"
 
 	var got config
-	input := fmt.Sprintf("%s\n",wantMastodonServer)
+	input := fmt.Sprintf("%s\n", wantMastodonServer)
 	reader := bufio.NewReader(strings.NewReader(input))
 	configMastodonServer(reader, &got)
 
@@ -37,7 +37,7 @@ func TestConfigMastodonAccessToken(t *testing.T) {
 	defer func() { os.Stdout = old }()
 
 	wantAuthCode := "MastodonUserAuthorizationCode"
-	
+
 	var app gomasto.Application
 	input := fmt.Sprintf("%s\n", wantAuthCode)
 	reader := bufio.NewReader(strings.NewReader(input))
@@ -46,7 +46,7 @@ func TestConfigMastodonAccessToken(t *testing.T) {
 		t.Fatal("Failed to configure mastodon, got error, did not expect one")
 	}
 
-	if  wantAuthCode != got {
+	if wantAuthCode != got {
 		t.Fatalf("Authorization code does not match expected value. Want %v, got %v", wantAuthCode, got)
 	}
 }
@@ -59,10 +59,10 @@ func TestMastodonClientConfig(t *testing.T) {
 	accessToken := "MastodonAccessToken"
 
 	want := &gomasto.Config{
-		Server: server,
-		ClientID: clientId,
+		Server:       server,
+		ClientID:     clientId,
 		ClientSecret: clientSecret,
-		AccessToken: accessToken,
+		AccessToken:  accessToken,
 	}
 
 	viper.Set("mastodon_server", server)
@@ -70,9 +70,9 @@ func TestMastodonClientConfig(t *testing.T) {
 	viper.Set("mastodon_client_secret", clientSecret)
 	viper.Set("mastodon_access_token", accessToken)
 
-	got :=  mastodonClientConfig()
+	got := mastodonClientConfig()
 
-	if got.Server != want.Server { 
+	if got.Server != want.Server {
 		t.Fatalf("%v Wrong server, want %v, got %v", configNotMatchMessage, want.Server, got.Server)
 	}
 
@@ -84,7 +84,7 @@ func TestMastodonClientConfig(t *testing.T) {
 		t.Fatalf("%v Wrong ClientSecret, want %v, got %v", configNotMatchMessage, want.ClientSecret, got.ClientSecret)
 	}
 
-	if got.AccessToken != want.AccessToken { 
+	if got.AccessToken != want.AccessToken {
 		t.Fatalf("%v Wrong AccessToken, want %v, got %v", configNotMatchMessage, want.AccessToken, got.AccessToken)
 	}
 }

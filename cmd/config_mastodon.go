@@ -2,18 +2,18 @@ package cmd
 
 import (
 	"bufio"
+	"context"
 	"fmt"
+	"net/url"
 	"os"
 	"strings"
-	"context"
-	"net/url"
 
 	gomasto "github.com/mattn/go-mastodon"
 	"github.com/spf13/viper"
 )
 
 func configMastodonServer(reader *bufio.Reader, c *config) {
-	if server, isSet := os.LookupEnv("MEGOPHONE_MASTODON_SERVER"); isSet { 
+	if server, isSet := os.LookupEnv("MEGOPHONE_MASTODON_SERVER"); isSet {
 		c.m.SetServer(server)
 	}
 
@@ -75,7 +75,7 @@ func mastodonClientConfig() *gomasto.Config {
 func configMastodon(ctx context.Context, reader *bufio.Reader, c *config) error {
 	configMastodonServer(reader, c)
 	app, err := registerMastodonApp(ctx, c)
-	if err != nil { 
+	if err != nil {
 		return fmt.Errorf("Failed to register mastodon application %v\n", err)
 	}
 

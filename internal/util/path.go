@@ -23,6 +23,6 @@ func GetConfigFilePath() (string, error) {
 	if os.Getenv("GOLANG_TESTING") == "true" {
 		return filepath.Join(cfgDir, "megophone-test.env"), nil
 	}
-	
+
 	return filepath.Join(cfgDir, "megophone.env"), nil
 }

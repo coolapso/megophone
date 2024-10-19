@@ -1,8 +1,8 @@
 package mastodon
 
 import (
-	"testing"
 	"github.com/coolapso/megophone/internal/util"
+	"testing"
 )
 
 func TestIsXlength(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 func TestServer(t *testing.T) {
 	want := "https://mastodon.social"
 
-	t.Run("Test set server", func (t *testing.T) {
+	t.Run("Test set server", func(t *testing.T) {
 		var s Secrets
 		s.SetServer(want)
 		got := s.server
@@ -17,8 +17,8 @@ func TestServer(t *testing.T) {
 		}
 	})
 
-	t.Run("Test Get server", func (t *testing.T) {
-		s := Secrets {
+	t.Run("Test Get server", func(t *testing.T) {
+		s := Secrets{
 			server: want,
 		}
 		got := s.GetServer()
@@ -32,7 +32,7 @@ func TestServer(t *testing.T) {
 func TestClientID(t *testing.T) {
 	want := "clientIDValue"
 
-	t.Run("Test SetClientID", func (t *testing.T) {
+	t.Run("Test SetClientID", func(t *testing.T) {
 		var s Secrets
 		s.SetClientID(want)
 		got := s.clientID
@@ -42,7 +42,7 @@ func TestClientID(t *testing.T) {
 		}
 	})
 
-	t.Run("Test GetClientID", func (t *testing.T) {
+	t.Run("Test GetClientID", func(t *testing.T) {
 		s := Secrets{
 			clientID: want,
 		}
@@ -57,7 +57,7 @@ func TestClientID(t *testing.T) {
 func TestClientSecret(t *testing.T) {
 	want := "clientSecretValue"
 
-	t.Run("Test SetClientSecret", func (t *testing.T) {
+	t.Run("Test SetClientSecret", func(t *testing.T) {
 		var s Secrets
 		s.SetClientSecret(want)
 		got := s.clientSecret
@@ -67,7 +67,7 @@ func TestClientSecret(t *testing.T) {
 		}
 	})
 
-	t.Run("Test GetClientSecret", func (t *testing.T) {
+	t.Run("Test GetClientSecret", func(t *testing.T) {
 		s := Secrets{
 			clientSecret: want,
 		}
@@ -82,7 +82,7 @@ func TestClientSecret(t *testing.T) {
 func TestAccessToken(t *testing.T) {
 	want := "accessTokenValue"
 
-	t.Run("Test SetAccessToken", func (t *testing.T) {
+	t.Run("Test SetAccessToken", func(t *testing.T) {
 		var s Secrets
 		s.SetAccessToken(want)
 		got := s.accessToken
@@ -92,7 +92,7 @@ func TestAccessToken(t *testing.T) {
 		}
 	})
 
-	t.Run("test GetAccessToken", func (t *testing.T) {
+	t.Run("test GetAccessToken", func(t *testing.T) {
 		s := Secrets{
 			accessToken: want,
 		}

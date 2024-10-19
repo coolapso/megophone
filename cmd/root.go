@@ -8,8 +8,8 @@ import (
 	"sync"
 
 	"github.com/coolapso/megophone/internal/util"
-	"github.com/coolapso/megophone/pkg/xdotcom"
 	"github.com/coolapso/megophone/pkg/mastodon"
+	"github.com/coolapso/megophone/pkg/xdotcom"
 
 	"github.com/michimani/gotwi"
 
@@ -22,8 +22,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-
-var	(
+var (
 	cfgFile string
 )
 
@@ -31,14 +30,13 @@ const (
 	redirectUri = "urn:ietf:wg:oauth:2.0:oob"
 )
 
-
 var rootCmd = &cobra.Command{
 	Use:   "megophone",
 	Short: "Post to twitter and mastodon from your CLI",
 	Long: `xm is a cli tool that allows you to post to both x (twitter)
 and mastodon at the same time, with a single command, from you CLI`,
 	Args: cobra.MinimumNArgs(1),
-	Run: func(cmd *cobra.Command, args []string) { 
+	Run: func(cmd *cobra.Command, args []string) {
 		text := strings.ReplaceAll(args[0], "\\n", "\n")
 		mediaPath, _ := cmd.Flags().GetString("media-path")
 
@@ -50,7 +48,7 @@ and mastodon at the same time, with a single command, from you CLI`,
 			}
 			fmt.Println(done())
 			os.Exit(0)
-		} 
+		}
 
 		if cmd.Flags().Changed("m-only") {
 			fmt.Println(posting())
@@ -65,7 +63,7 @@ and mastodon at the same time, with a single command, from you CLI`,
 
 		if errors := postAll(text, mediaPath); errors != nil {
 			fmt.Println("Failed posting to all social media")
-			for err := range errors { 
+			for err := range errors {
 				fmt.Println(err)
 			}
 			os.Exit(1)
@@ -84,21 +82,21 @@ func posting() string {
 	return "Posting..."
 }
 
-func postX(text, mediaPath string) (err error) { 
+func postX(text, mediaPath string) (err error) {
 	clientInput := &gotwi.NewClientInput{
 		AuthenticationMethod: gotwi.AuthenMethodOAuth1UserContext,
-		APIKey:				  viper.GetString("x_api_key"),
-		APIKeySecret:		  viper.GetString("x_api_key_secret"),
+		APIKey:               viper.GetString("x_api_key"),
+		APIKeySecret:         viper.GetString("x_api_key_secret"),
 		OAuthToken:           viper.GetString("x_oauth_token"),
 		OAuthTokenSecret:     viper.GetString("x_oauth_token_secret"),
 	}
 
 	x, err := gotwi.NewClient(clientInput)
-	if err != nil { 
+	if err != nil {
 		return fmt.Errorf("Failed to create X Client: %v\n", err)
 	}
 
-	if mediaPath != "" { 
+	if mediaPath != "" {
 		xv1Config := oauth1.NewConfig(clientInput.APIKey, clientInput.APIKeySecret)
 		token := oauth1.NewToken(clientInput.OAuthToken, clientInput.OAuthTokenSecret)
 		httpClient := xv1Config.Client(oauth1.NoContext, token)
@@ -110,7 +108,7 @@ func postX(text, mediaPath string) (err error) {
 		}
 
 		media, err := util.OpenMediaFile(mediaPath)
-		if err != nil { 
+		if err != nil {
 			return fmt.Errorf("Failed to open media file, %v\n", err)
 		}
 
@@ -123,8 +121,7 @@ func postX(text, mediaPath string) (err error) {
 		return nil
 	}
 
-
-	id, err :=  xdotcom.CreatePost(context.Background(), x, text)
+	id, err := xdotcom.CreatePost(context.Background(), x, text)
 	if err != nil {
 		return err
 	}
@@ -139,14 +136,13 @@ func postMastodon(text, mediaPath string) (err error) {
 	client := gomasto.NewClient(config)
 
 	if mediaPath != "" {
-		return 
+		return
 	}
 
 	id, err := mastodon.CreatePost(context.Background(), client, text, "public")
-	if err != nil { 
+	if err != nil {
 		return fmt.Errorf("Failed to post to mastodon, %v\n", err)
 	}
-
 
 	fmt.Println("Toot created with ID:", id)
 	return nil
@@ -164,18 +160,18 @@ func postAll(text, mediaPath string) []error {
 	errChan := make(chan error, 2)
 	wg.Add(2)
 
-	go func(wg *sync.WaitGroup, errChan chan <- error) {
+	go func(wg *sync.WaitGroup, errChan chan<- error) {
 		defer wg.Done()
-		if err := postX(text, mediaPath); err != nil  {
+		if err := postX(text, mediaPath); err != nil {
 			errChan <- err
 		}
 		errChan <- nil
 
 	}(&wg, errChan)
 
-	go func(wg *sync.WaitGroup, errChan chan <- error) {
+	go func(wg *sync.WaitGroup, errChan chan<- error) {
 		defer wg.Done()
-		if err := postMastodon(text, mediaPath); err != nil  {
+		if err := postMastodon(text, mediaPath); err != nil {
 			errChan <- err
 		}
 		errChan <- nil
@@ -186,9 +182,9 @@ func postAll(text, mediaPath string) []error {
 	close(errChan)
 
 	var errors []error
-	if len(errChan) >= 0 { 
+	if len(errChan) >= 0 {
 		for err := range errChan {
-			if err != nil { 
+			if err != nil {
 				errors = append(errors, err)
 			}
 		}

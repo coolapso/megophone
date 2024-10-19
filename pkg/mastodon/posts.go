@@ -1,8 +1,8 @@
 package mastodon
 
 import (
-	"fmt"
 	"context"
+	"fmt"
 	"github.com/coolapso/megophone/internal/util"
 	gomasto "github.com/mattn/go-mastodon"
 )
@@ -15,14 +15,14 @@ func CreatePost(ctx context.Context, client *gomasto.Client, text, visibility st
 	if !IsToothLenght(text) {
 		return "", fmt.Errorf("Text is too long for a toot")
 	}
-	
+
 	toot := &gomasto.Toot{
-		Status: text,
+		Status:     text,
 		Visibility: visibility,
 	}
 
 	post, err := client.PostStatus(ctx, toot)
-	if err != nil { 
+	if err != nil {
 		return "", fmt.Errorf("failed to post toot, %v\n", err)
 	}
 

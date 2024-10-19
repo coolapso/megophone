@@ -1,11 +1,10 @@
 package cmd
 
 import (
+	"github.com/coolapso/megophone/internal/util"
 	"os"
 	"testing"
-	"github.com/coolapso/megophone/internal/util"
 )
-
 
 func TestWriteConfigFile(t *testing.T) {
 	os.Setenv("GOLANG_TESTING", "true")
@@ -16,7 +15,7 @@ func TestWriteConfigFile(t *testing.T) {
 	}
 
 	cfgFilePath, err := util.GetConfigFilePath()
-	if err != nil { 
+	if err != nil {
 		t.Fatal("Failed to get config file path: ", err)
 	}
 

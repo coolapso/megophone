@@ -1,22 +1,22 @@
 package util
 
 import (
-	"strings"
-	"mime"
-	"path/filepath"
-	"os"
 	"io"
+	"mime"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 func GetMediaType(mediaPath string) string {
 	mimeType := mime.TypeByExtension(filepath.Ext(mediaPath))
-	
+
 	return strings.Split(mimeType, "/")[0]
 }
 
 func OpenMediaFile(mediaPath string) ([]byte, error) {
 	file, err := os.Open(mediaPath)
-	if err != nil { 
+	if err != nil {
 		return nil, err
 	}
 	defer file.Close()

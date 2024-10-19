@@ -12,22 +12,22 @@ import (
 
 func loadXVars(c *config) {
 	c.x.SetOauthToken(viper.GetString("x_oauth_token"))
-	if key, isSet := os.LookupEnv("MEGOPHONE_X_OAUTH_TOKEN"); isSet { 
+	if key, isSet := os.LookupEnv("MEGOPHONE_X_OAUTH_TOKEN"); isSet {
 		c.x.SetOauthToken(key)
 	}
 
 	c.x.SetOauthTokenSecret(viper.GetString("x_oauth_token_secret"))
-	if secret, isSet := os.LookupEnv("MEGOPHONE_X_OAUTH_TOKEN_SECRET"); isSet { 
+	if secret, isSet := os.LookupEnv("MEGOPHONE_X_OAUTH_TOKEN_SECRET"); isSet {
 		c.x.SetOauthTokenSecret(secret)
 	}
 
 	c.x.SetApiKey(viper.GetString("x_api_key"))
-	if key, isSet := os.LookupEnv("MEGOPHONE_X_API_KEY"); isSet { 
+	if key, isSet := os.LookupEnv("MEGOPHONE_X_API_KEY"); isSet {
 		c.x.SetApiKey(key)
 	}
 
 	c.x.SetApiKeySecret(viper.GetString("x_api_key_secret"))
-	if secret, isSet := os.LookupEnv("MEGOPHONE_X_API_KEY_SECRET"); isSet { 
+	if secret, isSet := os.LookupEnv("MEGOPHONE_X_API_KEY_SECRET"); isSet {
 		c.x.SetApiKeySecret(secret)
 	}
 }

@@ -1,9 +1,9 @@
 package util
 
-import ( 
-	"testing"
-	"os"
+import (
 	"io"
+	"os"
+	"testing"
 )
 
 func TestGetMediaType(t *testing.T) {
@@ -19,7 +19,7 @@ func TestGetMediaType(t *testing.T) {
 func TestOpenMediaFile(t *testing.T) {
 	filePath := "../../megophone.png"
 	file, err := os.Open(filePath)
-	if err != nil { 
+	if err != nil {
 		t.Fatal("Failed to open file:", err)
 	}
 

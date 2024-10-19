@@ -8,7 +8,7 @@ func TestMaskString(t *testing.T) {
 	t.Run("test 3 char string", func(t *testing.T) {
 		want := "bar"
 		got := MaskString("bar")
-		if got != want { 
+		if got != want {
 			t.Fatalf("Strings do not match, want %v, got %v", want, got)
 		}
 	})
@@ -16,7 +16,7 @@ func TestMaskString(t *testing.T) {
 	t.Run("test masked string", func(t *testing.T) {
 		want := "******baz"
 		got := MaskString("foobarbaz")
-		if got != want { 
+		if got != want {
 			t.Fatalf("Strings do not match, want %v, got %v", want, got)
 		}
 
@@ -25,9 +25,9 @@ func TestMaskString(t *testing.T) {
 
 func TestCleanString(t *testing.T) {
 	tests := []struct {
-		name string
+		name  string
 		input string
-		want string
+		want  string
 	}{
 		{"New line", "foo\\nbar", "foo\nbar"},
 		{"Tab", "foo\\tbar", "foo\tbar"},
@@ -37,7 +37,7 @@ func TestCleanString(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := CleanString(tt.input)
 			if got != tt.want {
-				t.Fatalf("String does not match expected value, want %v, got %v",tt.want, got)
+				t.Fatalf("String does not match expected value, want %v, got %v", tt.want, got)
 			}
 		})
 	}

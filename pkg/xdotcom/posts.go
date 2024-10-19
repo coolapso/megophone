@@ -35,28 +35,28 @@ func CreatePost(ctx context.Context, client *gotwi.Client, text string) (ID stri
 }
 
 func CreatePostWithMedia(ctx context.Context, client *gotwi.Client, clientV1 *twitterv1.Client, text string, media []byte, mediaType string) (ID string, err error) {
-		uploadResult, uploadHttpResp, err := clientV1.Media.Upload(media, mediaType) 
-		if err != nil {
-			return "", fmt.Errorf("Failed to upload media, %v\n", err)
-		}
+	uploadResult, uploadHttpResp, err := clientV1.Media.Upload(media, mediaType)
+	if err != nil {
+		return "", fmt.Errorf("Failed to upload media, %v\n", err)
+	}
 
-		if uploadHttpResp.StatusCode != 200 && uploadHttpResp.StatusCode != 201 {
-			return "", fmt.Errorf("Failed to uplade media, %v\n", uploadHttpResp.Status)
-		}
+	if uploadHttpResp.StatusCode != 200 && uploadHttpResp.StatusCode != 201 {
+		return "", fmt.Errorf("Failed to uplade media, %v\n", uploadHttpResp.Status)
+	}
 
-		mediaInput := &types.CreateInputMedia{
-			MediaIDs: []string{uploadResult.MediaIDString},
-		}
+	mediaInput := &types.CreateInputMedia{
+		MediaIDs: []string{uploadResult.MediaIDString},
+	}
 
-		postInput := &types.CreateInput{ 
-			Text: gotwi.String(text),
-			Media: mediaInput,
-		}
+	postInput := &types.CreateInput{
+		Text:  gotwi.String(text),
+		Media: mediaInput,
+	}
 
-		postResp, err := managetweet.Create(ctx, client, postInput)
-		if err != nil {
-			return "", fmt.Errorf("Failed to post tweet with media, %v\n", err)
-		}
+	postResp, err := managetweet.Create(ctx, client, postInput)
+	if err != nil {
+		return "", fmt.Errorf("Failed to post tweet with media, %v\n", err)
+	}
 
 	return *postResp.Data.ID, nil
 }
