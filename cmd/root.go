@@ -32,9 +32,9 @@ const (
 
 var rootCmd = &cobra.Command{
 	Use:   "megophone",
-	Short: "Post to twitter and mastodon from your CLI",
-	Long: `xm is a cli tool that allows you to post to both x (twitter)
-and mastodon at the same time, with a single command, from you CLI`,
+	Short: "Post to multiple social networks from your CLI",
+	Long: `Megophone is a tool for posting to multiple social networkds directly from 
+your CLI`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		text := strings.ReplaceAll(args[0], "\\n", "\n")
