@@ -3,7 +3,7 @@ package mastodon
 
 type Secrets struct {
 	server	  string
-	clientKey string
+	clientID string
 	clientSecret string
 	accessToken string
 }
@@ -12,8 +12,8 @@ func (s *Secrets) SetServer(server string) {
 	s.server = server
 }
 
-func(s *Secrets) SetClientKey(key string) { 
-	s.clientKey = key
+func(s *Secrets) SetClientID(key string) { 
+	s.clientID = key
 }
 
 func(s *Secrets) SetClientSecret (secret string) {
@@ -28,8 +28,8 @@ func (s *Secrets) GetServer() string {
 	return s.server
 }
 
-func(s *Secrets) GetClientKey() string {
-	return s.clientKey
+func(s *Secrets) GetClientID() string {
+	return s.clientID
 }
 
 func(s *Secrets) GetClientSecret() string {

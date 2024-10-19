@@ -29,24 +29,24 @@ func TestServer(t *testing.T) {
 	})
 }
 
-func TestClientKey(t *testing.T) {
-	want := "clientKeyValue"
+func TestClientID(t *testing.T) {
+	want := "clientIDValue"
 
-	t.Run("Test SetClientKey", func (t *testing.T) {
+	t.Run("Test SetClientID", func (t *testing.T) {
 		var s Secrets
-		s.SetClientKey(want)
-		got := s.clientKey
+		s.SetClientID(want)
+		got := s.clientID
 
 		if got != want {
 			t.Fatalf("expected %v, got %v", want, got)
 		}
 	})
 
-	t.Run("Test GetClientKey", func (t *testing.T) {
+	t.Run("Test GetClientID", func (t *testing.T) {
 		s := Secrets{
-			clientKey: want,
+			clientID: want,
 		}
-		got := s.GetClientKey()
+		got := s.GetClientID()
 
 		if got != want {
 			t.Fatalf("expected %v, got %v", want, got)

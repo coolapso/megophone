@@ -5,14 +5,17 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	// "net/url"
 
 	"github.com/coolapso/megophone/internal/util"
 	"github.com/coolapso/megophone/pkg/xdotcom"
+	"github.com/coolapso/megophone/pkg/mastodon"
 
 	"github.com/michimani/gotwi"
 	//Twitter API V2 does not yet support uploading media therefore these "legacy" packages are needed
 	"github.com/dghubble/oauth1"
 	twitterv1 "github.com/drswork/go-twitter/twitter"
+	gomasto "github.com/mattn/go-mastodon"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -21,6 +24,10 @@ import (
 
 var	(
 	cfgFile string
+)
+
+const (
+	redirectUri = "urn:ietf:wg:oauth:2.0:oob"
 )
 
 
@@ -35,25 +42,44 @@ and mastodon at the same time, with a single command, from you CLI`,
 		mediaPath, _ := cmd.Flags().GetString("media-path")
 
 		if cmd.Flags().Changed("x-only") {
-			fmt.Println("Posting...")
+			fmt.Println(posting())
 			if err := postX(text, mediaPath); err != nil {
 				fmt.Println("Failed posting to X,", err)
 				os.Exit(1)
 			}
-			fmt.Println("Done!")
+			fmt.Println(done())
 			os.Exit(0)
 		} 
 
 		if cmd.Flags().Changed("m-only") {
-			fmt.Printf("Posting: %v only to mastodon\n", text)
+			fmt.Println(posting())
+			if err := postMastodon(text, mediaPath); err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+
+			fmt.Println(done())
 			os.Exit(0)
 		}
 
-		fmt.Printf("Posting %v to twitter and Mastodon\n", text)
+		if err := postAll(text, mediaPath); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		fmt.Println(done())
+		os.Exit(0)
 	},
 }
 
-func postX(text string, mediaPath string) (err error) { 
+func done() string {
+	return "Done!"
+}
+
+func posting() string {
+	return "Posting..."
+}
+
+func postX(text, mediaPath string) (err error) { 
 	clientInput := &gotwi.NewClientInput{
 		AuthenticationMethod: gotwi.AuthenMethodOAuth1UserContext,
 		APIKey:				  viper.GetString("x_api_key"),
@@ -102,11 +128,41 @@ func postX(text string, mediaPath string) (err error) {
 	return nil
 }
 
+func postMastodon(text, mediaPath string) (err error) {
+
+	config := mastodonClientConfig()
+	client := gomasto.NewClient(config)
+
+	fmt.Println(client.Config)
+	fmt.Println(client.UserAgent)
+
+	if mediaPath != "" {
+		return 
+	}
+
+	id, err := mastodon.CreatePost(context.Background(), client, text, "public")
+	if err != nil { 
+		return fmt.Errorf("Failed to post to mastodon, %v\n", err)
+	}
+
+
+	fmt.Println("Toot created with ID:", id)
+	return nil
+}
+
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
 	}
+}
+
+func postAll(text, mediaPath string) error {
+
+	fmt.Println(posting())
+	fmt.Printf("Posting %v to twitter and Mastodon\n", text)
+
+	return nil
 }
 
 func init() {

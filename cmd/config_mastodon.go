@@ -1,0 +1,74 @@
+package cmd
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
+	"context"
+	"net/url"
+
+	gomasto "github.com/mattn/go-mastodon"
+	"github.com/spf13/viper"
+)
+
+func configMastodonServer(reader *bufio.Reader, c *config) {
+	if server, isSet := os.LookupEnv("MEGOPHONE_MASTODON_SERVER"); isSet { 
+		c.m.SetServer(server)
+	}
+
+	fmt.Printf("Mastodon Server (%v): ", c.m.GetServer())
+	GetServerInput, _ := reader.ReadString('\n')
+	if cleanInput := strings.TrimSpace(GetServerInput); cleanInput != "" {
+		c.m.SetServer(cleanInput)
+	}
+	viper.Set("mastodon_server", c.m.GetServer())
+}
+
+func registerMastodonApp(ctx context.Context, c *config) (*gomasto.Application, error) {
+	appConfig := &gomasto.AppConfig{
+		Server:       c.m.GetServer(),
+		ClientName:   "megophone",
+		Scopes:       "read write follow",
+		Website:      "https://github.com/coolapso/megophone",
+		RedirectURIs: redirectUri,
+	}
+
+	return gomasto.RegisterApp(ctx, appConfig)
+}
+
+func getMastodonUserAuthorizationCode(reader *bufio.Reader, app *gomasto.Application, c *config) (string, error) {
+	u, err := url.Parse(app.AuthURI)
+	if err != nil {
+		return "", fmt.Errorf("Failed to parse url, %v\n", err)
+	}
+
+	fmt.Printf("Open your browser to \n%s\n and copy/paste the given token\n", u)
+	fmt.Print("Paste the code here:")
+	getAccessTokenInput, _ := reader.ReadString('\n')
+	authorizationCode := strings.TrimSpace(getAccessTokenInput)
+
+	return authorizationCode, nil
+}
+
+func getAccessToken(ctx context.Context, authorizationCode string) error {
+	client := gomasto.NewClient(mastodonClientConfig())
+
+	if err := client.AuthenticateToken(ctx, authorizationCode, redirectUri); err != nil {
+		return err
+	}
+
+	fmt.Println(client.Config.AccessToken)
+	viper.Set("mastodon_access_token", client.Config.AccessToken)
+
+	return nil
+}
+
+func mastodonClientConfig() *gomasto.Config {
+	return &gomasto.Config{
+		Server:       viper.GetString("mastodon_server"),
+		ClientID:     viper.GetString("mastodon_client_id"),
+		ClientSecret: viper.GetString("mastodon_client_secret"),
+		AccessToken:  viper.GetString("mastodon_access_token"),
+	}
+}
