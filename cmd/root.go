@@ -54,8 +54,8 @@ var rootCmd = &cobra.Command{
 			os.Exit(0)
 		}
 
-		if errors := postAll(text, mediaPath); errors != nil {
-			for err := range errors {
+		if errors := postAll(text, mediaPath); len(errors) > 0 {
+			for _, err := range errors {
 				fmt.Println(err)
 			}
 			os.Exit(1)
@@ -152,43 +152,41 @@ func Execute() {
 	}
 }
 
-func postAll(text, mediaPath string) []error {
+func postAll(text, mediaPath string) (errors []error) {
 	var wg sync.WaitGroup
 	errChan := make(chan error, 2)
 	wg.Add(2)
 
-	go func(wg *sync.WaitGroup, errChan chan<- error) {
+	go func() {
 		defer wg.Done()
 		if err := postX(text, mediaPath); err != nil {
 			errChan <- err
 		}
 		errChan <- nil
 
-	}(&wg, errChan)
+	}()
 
-	go func(wg *sync.WaitGroup, errChan chan<- error) {
+	go func() {
 		defer wg.Done()
 		if err := postMastodon(text, mediaPath); err != nil {
 			errChan <- err
 		}
 		errChan <- nil
 
-	}(&wg, errChan)
+	}()
 
-	wg.Wait()
-	close(errChan)
+	go func() {
+		wg.Wait()
+		close(errChan)
+	}()
 
-	var errors []error
-	if len(errChan) >= 0 {
-		for err := range errChan {
-			if err != nil {
-				errors = append(errors, err)
-			}
+	for err := range errChan {
+		if err != nil {
+			errors = append(errors, err)
 		}
-		return errors
 	}
 
-	return nil
+	return errors
 }
 
 func init() {
