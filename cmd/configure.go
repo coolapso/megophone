@@ -33,22 +33,8 @@ type config struct {
 func configMegophone(reader *bufio.Reader) error {
 	loadXVars(&c)
 	configX(reader, &c)
-	configMastodonServer(reader, &c)
-	app, err := registerMastodonApp(context.Background(), &c)
-	if err != nil { 
+	if err := configMastodon(context.Background(), reader, &c); err != nil {
 		return err
-	}
-
-	viper.Set("mastodon_client_id", app.ClientID)
-	viper.Set("mastodon_client_secret", app.ClientSecret)
-
-	code, err := getMastodonUserAuthorizationCode(reader, app, &c)
-	if err != nil {
-		return fmt.Errorf("Failed to configure mastodon access token, %v\n", err)
-	}
-
-	if err := getAccessToken(context.Background(), code); err != nil {
-		return fmt.Errorf("Failed to get access token, %v\n", err)
 	}
 
 	if err := writeConfigFile(); err != nil {

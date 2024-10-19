@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	// "net/url"
+	"sync"
 
 	"github.com/coolapso/megophone/internal/util"
 	"github.com/coolapso/megophone/pkg/xdotcom"
 	"github.com/coolapso/megophone/pkg/mastodon"
 
 	"github.com/michimani/gotwi"
+
 	//Twitter API V2 does not yet support uploading media therefore these "legacy" packages are needed
 	"github.com/dghubble/oauth1"
 	twitterv1 "github.com/drswork/go-twitter/twitter"
@@ -62,10 +63,14 @@ and mastodon at the same time, with a single command, from you CLI`,
 			os.Exit(0)
 		}
 
-		if err := postAll(text, mediaPath); err != nil {
-			fmt.Println(err)
+		if errors := postAll(text, mediaPath); errors != nil {
+			fmt.Println("Failed posting to all social media")
+			for err := range errors { 
+				fmt.Println(err)
+			}
 			os.Exit(1)
 		}
+
 		fmt.Println(done())
 		os.Exit(0)
 	},
@@ -133,9 +138,6 @@ func postMastodon(text, mediaPath string) (err error) {
 	config := mastodonClientConfig()
 	client := gomasto.NewClient(config)
 
-	fmt.Println(client.Config)
-	fmt.Println(client.UserAgent)
-
 	if mediaPath != "" {
 		return 
 	}
@@ -157,10 +159,41 @@ func Execute() {
 	}
 }
 
-func postAll(text, mediaPath string) error {
+func postAll(text, mediaPath string) []error {
+	var wg sync.WaitGroup
+	errChan := make(chan error, 2)
+	wg.Add(2)
 
-	fmt.Println(posting())
-	fmt.Printf("Posting %v to twitter and Mastodon\n", text)
+	go func(wg *sync.WaitGroup, errChan chan <- error) {
+		defer wg.Done()
+		if err := postX(text, mediaPath); err != nil  {
+			errChan <- err
+		}
+		errChan <- nil
+
+	}(&wg, errChan)
+
+	go func(wg *sync.WaitGroup, errChan chan <- error) {
+		defer wg.Done()
+		if err := postMastodon(text, mediaPath); err != nil  {
+			errChan <- err
+		}
+		errChan <- nil
+
+	}(&wg, errChan)
+
+	wg.Wait()
+	close(errChan)
+
+	var errors []error
+	if len(errChan) >= 0 { 
+		for err := range errChan {
+			if err != nil { 
+				errors = append(errors, err)
+			}
+		}
+		return errors
+	}
 
 	return nil
 }

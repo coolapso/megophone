@@ -37,7 +37,7 @@ func registerMastodonApp(ctx context.Context, c *config) (*gomasto.Application, 
 	return gomasto.RegisterApp(ctx, appConfig)
 }
 
-func getMastodonUserAuthorizationCode(reader *bufio.Reader, app *gomasto.Application, c *config) (string, error) {
+func getMastodonUserAuthorizationCode(reader *bufio.Reader, app *gomasto.Application) (string, error) {
 	u, err := url.Parse(app.AuthURI)
 	if err != nil {
 		return "", fmt.Errorf("Failed to parse url, %v\n", err)
@@ -51,17 +51,16 @@ func getMastodonUserAuthorizationCode(reader *bufio.Reader, app *gomasto.Applica
 	return authorizationCode, nil
 }
 
-func getAccessToken(ctx context.Context, authorizationCode string) error {
+func getAccessToken(ctx context.Context, authorizationCode string) (string, error) {
 	client := gomasto.NewClient(mastodonClientConfig())
 
 	if err := client.AuthenticateToken(ctx, authorizationCode, redirectUri); err != nil {
-		return err
+		return "", err
 	}
 
 	fmt.Println(client.Config.AccessToken)
-	viper.Set("mastodon_access_token", client.Config.AccessToken)
 
-	return nil
+	return client.Config.AccessToken, nil
 }
 
 func mastodonClientConfig() *gomasto.Config {
@@ -71,4 +70,28 @@ func mastodonClientConfig() *gomasto.Config {
 		ClientSecret: viper.GetString("mastodon_client_secret"),
 		AccessToken:  viper.GetString("mastodon_access_token"),
 	}
+}
+
+func configMastodon(ctx context.Context, reader *bufio.Reader, c *config) error {
+	configMastodonServer(reader, c)
+	app, err := registerMastodonApp(ctx, c)
+	if err != nil { 
+		return fmt.Errorf("Failed to register mastodon application %v\n", err)
+	}
+
+	viper.Set("mastodon_client_id", app.ClientID)
+	viper.Set("mastodon_client_secret", app.ClientSecret)
+
+	code, err := getMastodonUserAuthorizationCode(reader, app)
+	if err != nil {
+		return fmt.Errorf("Failed to configure mastodon access token, %v\n", err)
+	}
+
+	accessToken, err := getAccessToken(ctx, code)
+	if err != nil {
+		return fmt.Errorf("Failed to get access token, %v\n", err)
+	}
+	viper.Set("mastodon_access_token", accessToken)
+
+	return nil
 }
