@@ -29,6 +29,10 @@ Megaphone allows you to post to multiple social networks simultaneously from you
 
 Easier ways to install are planned and coming soon.
 
+### AUR
+
+On Arch linux you can use the AUR `megophone-bin`
+
 ### Go Install
 
 #### Latest version 
