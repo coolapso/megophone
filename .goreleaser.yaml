@@ -23,10 +23,3 @@ aurs:
 announce:
   discord:
     enabled: true
-
-  mastodon:
-    enabled: true
-    server: https://mastodon.social
-
-  twitter:
-    enabled: true
