@@ -7,7 +7,7 @@ on:
 
 jobs:
   tests:
-    uses: coolapso/megophone/.github/workflows/test.yml@dev
+    uses: coolapso/megophone/.github/workflows/test.yaml@main
 
   release:
     needs: tests
