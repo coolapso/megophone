@@ -46,7 +46,6 @@ and mastodon at the same time, with a single command, from you CLI`,
 				fmt.Println("Failed posting to X,", err)
 				os.Exit(1)
 			}
-			fmt.Println(done())
 			os.Exit(0)
 		}
 
@@ -56,8 +55,6 @@ and mastodon at the same time, with a single command, from you CLI`,
 				fmt.Println(err)
 				os.Exit(1)
 			}
-
-			fmt.Println(done())
 			os.Exit(0)
 		}
 
@@ -68,14 +65,8 @@ and mastodon at the same time, with a single command, from you CLI`,
 			}
 			os.Exit(1)
 		}
-
-		fmt.Println(done())
 		os.Exit(0)
 	},
-}
-
-func done() string {
-	return "Done!"
 }
 
 func posting() string {
