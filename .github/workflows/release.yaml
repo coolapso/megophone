@@ -6,7 +6,6 @@ on:
       - 'main'
 
 jobs:
-  jobs:
   tests:
     uses: coolapso/megophone/.github/workflows/test.yml@dev
 
