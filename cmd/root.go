@@ -33,8 +33,6 @@ const (
 var rootCmd = &cobra.Command{
 	Use:   "megophone",
 	Short: "Post to multiple social networks from your CLI",
-	Long: `Megophone is a tool for posting to multiple social networkds directly from 
-your CLI`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		text := strings.ReplaceAll(args[0], "\\n", "\n")
