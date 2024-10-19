@@ -27,7 +27,23 @@ Megaphone allows you to post to multiple social networks simultaneously from you
 
 ## Installation 
 
-For now, you have to grab the binary from the releases page. Easier ways to install are planned and coming soon.
+Easier ways to install are planned and coming soon.
+
+### Go Install
+
+#### Latest version 
+
+`go install github.com/coolapso/megophone`
+
+#### Specific version
+
+`go install github.com/coolapso/megophone@v1.0.0`
+
+### Manual install
+
+* Grab the binary from the [releases page](https://github.com/coolapso/megophone/releases).
+* Extract the binary
+* Execute it
 
 ## Setup
 
@@ -78,6 +94,16 @@ Flags:
 
 Use "megophone [command] --help" for more information about a command.
 ```
+
+## Build 
+
+### With makefile
+
+`make build`
+
+### Manually
+
+`go build -o megophone`
 
 # Contributions
 
