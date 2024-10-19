@@ -41,7 +41,7 @@ func CreatePostWithMedia(ctx context.Context, client *gotwi.Client, clientV1 *tw
 	}
 
 	if uploadHttpResp.StatusCode != 200 && uploadHttpResp.StatusCode != 201 {
-		return "", fmt.Errorf("Failed to uplade media, %v\n", uploadHttpResp.Status)
+		return "", fmt.Errorf("Failed to upload media, %v\n", uploadHttpResp.Status)
 	}
 
 	mediaInput := &types.CreateInputMedia{
