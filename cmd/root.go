@@ -118,7 +118,18 @@ func postMastodon(text, mediaPath string) (err error) {
 	client := gomasto.NewClient(config)
 
 	if mediaPath != "" {
-		return
+		media, err := client.UploadMedia(context.Background(), mediaPath)
+		if err != nil {
+			return fmt.Errorf("Failed to upload media file, %v\n", err)
+		}
+
+		id, err := mastodon.CreatePostWithMedia(context.Background(), client, string(media.ID), text, "public")
+		if err != nil {
+			return err
+		}
+		toothCreated(id)
+
+		return nil
 	}
 
 	id, err := mastodon.CreatePost(context.Background(), client, text, "public")
@@ -126,8 +137,12 @@ func postMastodon(text, mediaPath string) (err error) {
 		return fmt.Errorf("Failed to post to mastodon, %v\n", err)
 	}
 
-	fmt.Println("Toot created with ID:", id)
+	toothCreated(id)
 	return nil
+}
+
+func toothCreated(id string) {
+	fmt.Println("Toot created with ID:", id)
 }
 
 func Execute() {
