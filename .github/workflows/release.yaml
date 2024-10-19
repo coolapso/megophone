@@ -8,7 +8,7 @@ on:
 jobs:
   jobs:
   tests:
-    uses: coolapso/terraform-aws-cloudfront-and-edge/.github/workflows/tests.yml@main
+    uses: coolapso/megophone/.github/workflows/test.yml@main
 
   release:
     needs: tests
