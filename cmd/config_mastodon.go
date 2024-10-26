@@ -55,16 +55,6 @@ func getMastodonUserAuthorizationCode(reader *bufio.Reader, app *gomasto.Applica
 	return authorizationCode, nil
 }
 
-func getAccessToken(ctx context.Context, authorizationCode string) (string, error) {
-	client := gomasto.NewClient(mastodonClientConfig())
-
-	if err := client.AuthenticateToken(ctx, authorizationCode, redirectUri); err != nil {
-		return "", err
-	}
-
-	return client.Config.AccessToken, nil
-}
-
 func mastodonClientConfig() *gomasto.Config {
 	return &gomasto.Config{
 		Server:       viper.GetString("mastodon_server"),
@@ -89,11 +79,13 @@ func configMastodon(ctx context.Context, reader *bufio.Reader, c *config) error 
 		return fmt.Errorf("Failed to configure mastodon access token, %v\n", err)
 	}
 
-	accessToken, err := getAccessToken(ctx, code)
-	if err != nil {
-		return fmt.Errorf("Failed to get access token, %v\n", err)
+	client := gomasto.NewClient(mastodonClientConfig())
+
+	if err := client.GetUserAccessToken(ctx, code, redirectUri); err != nil {
+		return fmt.Errorf("Failed to get user access token %s\n", err)
 	}
-	viper.Set("mastodon_access_token", accessToken)
+
+	viper.Set("mastodon_access_token", client.Config.AccessToken)
 
 	return nil
 }
