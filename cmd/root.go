@@ -24,6 +24,7 @@ import (
 
 var (
 	cfgFile string
+	profile string
 )
 
 const (
@@ -192,6 +193,7 @@ func postAll(text, mediaPath string) (errors []error) {
 func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $XDG_HOME_CONFIG/megophone/config.yaml)")
+	rootCmd.PersistentFlags().StringVar(&profile, "profile", "default", "The configuration profile to use")
 	rootCmd.Flags().BoolP("x-only", "x", false, "Post to X only")
 	rootCmd.Flags().BoolP("m-only", "m", false, "Post to Mastodon Only")
 	rootCmd.Flags().StringP("media-path", "p", "", "Path of media to be uploaded")
@@ -208,7 +210,7 @@ func initConfig() {
 		cfgDir, err := util.GetConfigDir()
 		cobra.CheckErr(err)
 		viper.AddConfigPath(cfgDir)
-		viper.SetConfigName("megophone.env")
+		viper.SetConfigName(fmt.Sprintf("%s.env", profile))
 		viper.SetConfigType("env")
 	}
 

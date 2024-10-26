@@ -26,10 +26,10 @@ func configMastodonServer(reader *bufio.Reader, c *config) {
 	viper.Set("mastodon_server", c.m.GetServer())
 }
 
-func registerMastodonApp(ctx context.Context, c *config) (*gomasto.Application, error) {
+func registerMastodonApp(ctx context.Context, c *config, p string) (*gomasto.Application, error) {
 	appConfig := &gomasto.AppConfig{
 		Server:       c.m.GetServer(),
-		ClientName:   "megophone",
+		ClientName:   fmt.Sprintf("megophone-%s", p),
 		Scopes:       "read write follow",
 		Website:      "https://github.com/coolapso/megophone",
 		RedirectURIs: redirectUri,
@@ -64,9 +64,9 @@ func mastodonClientConfig() *gomasto.Config {
 	}
 }
 
-func configMastodon(ctx context.Context, reader *bufio.Reader, c *config) error {
+func configMastodon(ctx context.Context, reader *bufio.Reader, c *config, p string) error {
 	configMastodonServer(reader, c)
-	app, err := registerMastodonApp(ctx, c)
+	app, err := registerMastodonApp(ctx, c, p)
 	if err != nil {
 		return fmt.Errorf("Failed to register mastodon application %v\n", err)
 	}

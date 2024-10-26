@@ -33,24 +33,24 @@ type config struct {
 func configMegophone(reader *bufio.Reader) error {
 	loadXVars(&c)
 	configX(reader, &c)
-	if err := configMastodon(context.Background(), reader, &c); err != nil {
+	if err := configMastodon(context.Background(), reader, &c, profile); err != nil {
 		return err
 	}
 
-	if err := writeConfigFile(); err != nil {
+	if err := writeConfigFile(profile); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func writeConfigFile() error {
+func writeConfigFile(p string) error {
 	cfgDir, err := util.GetConfigDir()
 	if err != nil {
 		return fmt.Errorf("Failed to get config directory: %v", err.Error())
 	}
 
-	cfgFilePath, err := util.GetConfigFilePath()
+	cfgFilePath, err := util.GetConfigFilePath(p)
 	if err != nil {
 		return fmt.Errorf("Failed to get config file path: %v", err.Error())
 	}

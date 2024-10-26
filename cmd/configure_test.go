@@ -7,14 +7,13 @@ import (
 )
 
 func TestWriteConfigFile(t *testing.T) {
-	os.Setenv("GOLANG_TESTING", "true")
-	defer os.Unsetenv("GOLANG_TESTING")
+	profile := "megophone-test"
 
-	if err := writeConfigFile(); err != nil {
+	if err := writeConfigFile(profile); err != nil {
 		t.Fatal("Failed to write config file: ", err)
 	}
 
-	cfgFilePath, err := util.GetConfigFilePath()
+	cfgFilePath, err := util.GetConfigFilePath(profile)
 	if err != nil {
 		t.Fatal("Failed to get config file path: ", err)
 	}

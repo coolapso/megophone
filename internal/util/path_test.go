@@ -25,6 +25,15 @@ func TestGetConfigDir(t *testing.T) {
 	}
 }
 
+func TestGetconfigFileName(t *testing.T) {
+	want := "default.env"
+	got := GetConfigFileName("default")
+
+	if want != got {
+		t.Fatalf("Wrong filename, want %s, got %s", want, got)
+	}
+}
+
 func TestGetConfigFilePath(t *testing.T) {
 	cfgDir, err := os.UserConfigDir()
 	if err != nil {
@@ -32,23 +41,9 @@ func TestGetConfigFilePath(t *testing.T) {
 
 	}
 
-	t.Run("Test main fileppath", func(t *testing.T) {
-		want := filepath.Join(cfgDir, "megophone", "megophone.env")
-		got, err := GetConfigFilePath()
-		if err != nil {
-			t.Fatalf("Got error didn't expect one: %v", err)
-		}
-
-		if want != got {
-			t.Fatalf("Wrong file path: want %v, got %v", want, got)
-		}
-	})
-
-	t.Run("Test golang testing fileppath", func(t *testing.T) {
+	t.Run("Test default fileppath", func(t *testing.T) {
 		want := filepath.Join(cfgDir, "megophone", "megophone-test.env")
-		os.Setenv("GOLANG_TESTING", "true")
-		defer os.Unsetenv("GOLANG_TESTING")
-		got, err := GetConfigFilePath()
+		got, err := GetConfigFilePath("megophone-test")
 		if err != nil {
 			t.Fatalf("Got error didn't expect one: %v", err)
 		}
@@ -57,5 +52,4 @@ func TestGetConfigFilePath(t *testing.T) {
 			t.Fatalf("Wrong file path: want %v, got %v", want, got)
 		}
 	})
-
 }

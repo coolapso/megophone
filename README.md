@@ -17,18 +17,23 @@ Megaphone allows you to post to multiple social networks simultaneously from you
 ## Features
 
 * Configuration utility: use `megaphone configure` to set up the tool
+* Multiple configuration profiles: use the `--profile` flag to setup and use different accounts
 * Post to all supported social networks
 * Post to all supported social networkds with images and videos
 * Post only to X: use `megaphone -x "text"` to post only to X
 * Post to Mastodon: use `megaphone -m "text"` to post only to Mastodon
 
 
+## Supported social netrowks
+* X
+* Mastodon
+
 ### Planed features
 
 * Threads
 * Facebook (Still not very sure about this one)
 * Threading, split longer texts and post them as threads
-* Polls
+* Polls for Mastodon and X
 
 ## Installation 
 
@@ -75,7 +80,6 @@ These tokens can also be provided with the following environment variables:
 > [!NOTE]  
 > You are subject to Twitter API pricing and limits. Please make sure to check the X developer portal information: https://developer.x.com/en
 
-
 ### Mastodon 
 
 * Mastodon configuration is all done through `megaphone configure`. During the process, it will open your browser and request you to paste the authorization code.
@@ -99,6 +103,7 @@ Flags:
   -h, --help                help for megophone
   -m, --m-only              Post to Mastodon Only
   -p, --media-path string   Path of media to be uploaded
+      --profile string      The configuration profile to use (default "default")
   -x, --x-only              Post to X only
 
 Use "megophone [command] --help" for more information about a command.
