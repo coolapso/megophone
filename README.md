@@ -109,6 +109,10 @@ Flags:
 Use "megophone [command] --help" for more information about a command.
 ```
 
+### Profiles
+
+Profiles are distinct sets of accounts designated for posting. For instance, you can create a profile for your personal accounts and another for your work accounts. By using the `--profile` flag, you can effortlessly switch between these profiles when posting. If the flag is not specified, the default profile will be used.
+
 ## Build 
 
 ### With makefile
