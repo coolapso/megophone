@@ -11,9 +11,6 @@ Megaphone allows you to post to multiple social networks simultaneously from you
   <img src="https://raw.githubusercontent.com/coolapso/megophone/refs/heads/main/media/usage.gif">
 </p>
 
-
- 
-
 ## Features
 
 * Configuration utility: use `megaphone configure` to set up the tool
@@ -37,8 +34,6 @@ Megaphone allows you to post to multiple social networks simultaneously from you
 
 ## Installation 
 
-Easier ways to install are planned and coming soon.
-
 ### AUR
 
 On Arch linux you can use the AUR `megophone-bin`
@@ -52,6 +47,22 @@ On Arch linux you can use the AUR `megophone-bin`
 #### Specific version
 
 `go install github.com/coolapso/megophone@v1.0.0`
+
+### Linux Script
+
+It is also impossible to install on any linux distro with the installation script
+
+#### Latest version
+
+```
+curl -L https://megophone.coolapso.sh/install.sh | bash
+```
+
+#### Specific version
+
+```
+curl -L https://megophone.coolapso.sh/install.sh | VERSION=1.1.0 bash
+```
 
 ### Manual install
 
