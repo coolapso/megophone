@@ -198,6 +198,7 @@ func init() {
 	rootCmd.Flags().BoolP("m-only", "m", false, "Post to Mastodon Only")
 	rootCmd.Flags().StringP("media-path", "p", "", "Path of media to be uploaded")
 	rootCmd.AddCommand(configure)
+	rootCmd.AddCommand(versionCmd)
 }
 
 // initConfig reads in config file and ENV variables if set.

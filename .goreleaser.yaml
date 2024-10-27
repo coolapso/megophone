@@ -3,6 +3,9 @@ builds:
   - binary: megophone
     env:
     - CGO_ENABLED=0
+    ldflags:
+    - -X cmd.Version={{.Version}}
+
 aurs:
   - name: megophone-bin
     homepage: "https://github.com/coolapso/megophone"
