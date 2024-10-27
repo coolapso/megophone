@@ -7,8 +7,8 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Variables
-REPO="coolapso/megophone"  # Replace 'user/megophone' with the actual repository path
-VERSION=${1:-"latest"}
+REPO="coolapso/megophone"
+VERSION=${VERSION:-"latest"}
 INSTALL_DIR="/usr/local/bin"
 
 # Determine OS and Architecture
