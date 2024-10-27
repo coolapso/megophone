@@ -61,7 +61,7 @@ curl -L https://megophone.coolapso.sh/install.sh | bash
 #### Specific version
 
 ```
-curl -L https://megophone.coolapso.sh/install.sh | VERSION=1.1.0 bash
+curl -L https://megophone.coolapso.sh/install.sh | VERSION="v1.1.0" bash
 ```
 
 ### Manual install
