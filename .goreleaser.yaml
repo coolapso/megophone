@@ -4,7 +4,7 @@ builds:
     env:
     - CGO_ENABLED=0
     ldflags:
-    - -X cmd.Version={{.Version}}
+    - -X github.com/coolapso/megophone/cmd.Version={{.Version}}
 
 aurs:
   - name: megophone-bin
