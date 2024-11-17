@@ -3,6 +3,10 @@
 </p>
 
 # megophone
+[![Release](https://github.com/coolapso/megophone/actions/workflows/release.yaml/badge.svg?branch=main)](https://github.com/coolapso/megophone/actions/workflows/release.yaml)
+![GitHub Tag](https://img.shields.io/github/v/tag/coolapso/megophone?logo=semver&label=semver&labelColor=gray&color=green)
+[![Go Report Card](https://goreportcard.com/badge/github.com/coolapso/megophone)](https://goreportcard.com/report/github.com/coolapso/megophone)
+![GitHub Sponsors](https://img.shields.io/github/sponsors/coolapso?style=flat&logo=githubsponsors)
 
 A single tool for multiple social networks.
 
@@ -138,7 +142,7 @@ Profiles are distinct sets of accounts designated for posting. For instance, you
 
 Improvements and suggestions are always welcome, feel free to check for any open issues, open a new Issue or Pull Request
 
-If you like this project and want to support / contribute in a different way you can always: 
+If you like this project and want to support / contribute in a different way you can always [:heart: Sponsor Me](https://github.com/sponsors/coolapso) or
 
 <a href="https://www.buymeacoffee.com/coolapso" target="_blank">
   <img src="https://cdn.buymeacoffee.com/buttons/default-yellow.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;" />
