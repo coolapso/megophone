@@ -6,7 +6,7 @@ require (
 	github.com/dghubble/oauth1 v0.7.3
 	github.com/drswork/go-twitter v0.0.0-20221107160839-dea1b6ed53d7
 	github.com/mattn/go-mastodon v0.0.10-0.20241025080708-213f36e0e3c8
-	github.com/michimani/gotwi v0.16.1
+	github.com/michimani/gotwi v0.17.0
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
 )
